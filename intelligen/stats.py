@@ -179,19 +179,3 @@ class Normal(Distribution):
     
     def PDF(self, k: float) -> float:
         return np.exp((-1/2) * ((k - self.mu)/self.s)**2) / (self.s * np.sqrt(2*np.pi)) 
-
-
-""" B = Binomial(40,0.5)
-B.plot_CDF() """
-
-""" G = Geometric(0.5)
-G.plot_CDF() """
-
-""" H = Hypergeometric(500,200,60)
-H.plot_PMF()
-
-P = Poisson(10)
-P.plot_PMF() """
-
-N = Normal()
-N.plot_PDF()
