@@ -53,6 +53,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Bouchet07/intelligen',
-    version='0.8.2',
+    version='0.8.3',
     zip_safe=False,
 )
