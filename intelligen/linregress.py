@@ -205,6 +205,18 @@ class GradientDescent:
         plt.ylabel('MSE')
         if show: plt.show()       
 
+    def mse(self, y_real: Vector = None, y_pred: Vector = None) -> float:
+        """Returns the mean squared error
+        Args:
+            y_real (Vector, optional): Real data. Defaults to None (takes the fitted data)
+            y_pred (Vector, optional): Predicted data. Defaults to None (takes the predicted data)
+        Returns:
+            float: Mean squared error
+        """
+        if y_real is None: y_real = self.y
+        if y_pred is None: y_pred = self.y_pred
+        return mean_squared_error(y_real, y_pred)
+
 
 def main() -> None:
     """ x = np.random.rand(1000) * 4 -2
