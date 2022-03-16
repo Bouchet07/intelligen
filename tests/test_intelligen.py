@@ -6,12 +6,6 @@
 import unittest
 
 from intelligen import intelligen
+from intelligen import numeric
 
-
-class TestAI(unittest.TestCase):
-    """Tests for `intelligen` package."""
-
-    
-
-    def test_000_something(self):
-        self.assertEqual(5,5)
+#import test_numeric

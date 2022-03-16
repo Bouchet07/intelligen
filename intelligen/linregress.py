@@ -4,7 +4,7 @@ Matrix2D = List[Vector]
 
 import numpy as np
 import matplotlib.pyplot as plt
-from .AI import mean_squared_error
+from .stats import mean_squared_error
 
 # Bibliography https://github.com/arseniyturin/SGD-From-Scratch/blob/master/Gradient%20Descent.ipynb
 
@@ -99,7 +99,6 @@ class LinearRegression:
             ax.scatter(self.X[:, 0], self.X[:, 1], self.y, c = 'lightcoral')
             if delimeters: ax.scatter(x1, x2, y, c = 'royalblue', alpha = 0.5)
             if show: plt.show()
-
 
 class GradientDescent:
 
@@ -205,7 +204,7 @@ class GradientDescent:
         plt.ylabel('MSE')
         if show: plt.show()       
 
-    def mse(self, y_real: Vector = None, y_pred: Vector = None) -> float:
+    def show_mse(self, y_real: Vector = None, y_pred: Vector = None) -> float:
         """Returns the mean squared error
         Args:
             y_real (Vector, optional): Real data. Defaults to None (takes the fitted data)
