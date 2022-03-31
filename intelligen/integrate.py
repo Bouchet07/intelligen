@@ -149,10 +149,6 @@ def trapz(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'trapz', h, f, a, b, N)
 
-y = np.array([[1,2],[3,4]])
-
-print(trapz(f= lambda x: np.sin(x), a=0, b=1, N=50))
-
 def simpson(y: Vector=None, x: Vector=None, h: float=1,
             f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
     """
@@ -382,10 +378,6 @@ def odeEuler(f: Function2d, t0: float, tfin: float, N: int, y0: Union[float, Vec
     else:
         T = np.linspace(t0, tfin, N+1)
         h = (tfin - t0) / N
-        """ Manual
-        T = []
-        for i in range(N):
-            T[i] = t0 + i*h """
         U = np.empty(N+1)
         U[0] = y0
         for i in range(1, N+1):
@@ -452,8 +444,7 @@ def slope_field(f: Function2d, range: list = None,
     plot figure
 
     """
-
-
+    
     if range is None and xlim is None and ylim is None:
         range = [-5,5]
         x1, x2 = range
@@ -497,28 +488,3 @@ def slope_field(f: Function2d, range: list = None,
     plt.xlabel('x')
     plt.ylabel('y')
     if show: plt.show()
-
-
-def fun(x,y):
-    return y
-
-def fun2(x,y):
-    return x**2 + y*2
-
-def fun3(x,y):
-    return x + np.sin(y)
-
-def f(t, y):
-    return t
-
-
-""" T,U = odeEuler(f,-5,5,1000,[10,8])
-plt.ylim(-5,5)
-plt.xlim(-5,5)
-plt.plot(T[0], U[0])
-plt.plot(T[1], U[1])
-slope_field(f, cmap='spring', normalize=False) """
-
-
-
-
