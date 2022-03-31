@@ -18,9 +18,3 @@ def time_delay(x: Vector, y: Vector, t: float) -> Vector:
     x = x + t
     return x, y
 
-
-
-t = np.linspace(-5,5,11)
-x, y = time_delay(t,delta(t),2)
-plt.stem(x,y)
-plt.show()

@@ -106,3 +106,4 @@ ENV/
 
 # Test ipynb
 .Test.ipynb
+Test.ipynb

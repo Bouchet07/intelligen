@@ -6,13 +6,39 @@ from typing import List, Union
 Vector = List[float]
 
 from numpy import pi, sqrt
-from numeric import factorial, combination
-from integrate import trapz
+from .numeric import factorial, combination
+from .integrate import trapz
 
 
 
 #---------------------- Methods -----------------------#
-                
+
+def mean_squared_error(y_real: Vector, y_pred: Vector) -> float:
+    """Returns the mean squared error
+    Args:
+        y_real (Vector): Real data
+        y_pred (Vector): Predicted data
+    Returns:
+        float: mean squared error
+    """
+    y_real = np.array(y_real)
+    y_pred = np.array(y_pred)
+    
+    return np.mean((y_real - y_pred)**2)
+def mean_absolute_error(y_real: Vector, y_pred: Vector) -> float:
+    """Returns the mean absolute error
+    Args:
+        y_real (Vector): Real data
+        y_pred (Vector): Predicted data
+    Returns:
+        float: mean absolute error
+    """
+    y_real = np.array(y_real)
+    y_pred = np.array(y_pred)
+    
+    return np.mean(np.abs(y_real - y_pred))
+
+
 def erf(x: Union[float, Vector]) -> Union[float, Vector]:
     """
     Error Function
@@ -57,7 +83,6 @@ class Distribution:
     """Main class for plotting distributions
     """
 
-    
     
     def plot_CDF(self, show = True) -> None:
         """Plots the Cumulative distribution function of a distribution
@@ -396,7 +421,6 @@ class Geometric(DiscreteDistribution):
     def CDF(self, k: float) -> float:
         return 1 - (1 - self.p)**np.floor(k)
 
-
 class NegativeBinomial(DiscreteDistribution):
     """
     Negative Binomial Distribution
@@ -500,5 +524,3 @@ class Normal(Distribution):
     
     def CDF(self, x: float) -> float:
         return 1/2 * (1 + erf((x - self.mu)/(self.s*np.sqrt(2))))
-
-

@@ -11,13 +11,19 @@ from .stats import mean_squared_error
 class LinearRegression:
 
     def fit(self, X: Matrix2D, y: Vector) -> None:
-        """Fits the data and calculates the coefficients of the linear regression
-        Args:
-            X (Matrix2D): Data
-            y (Vector): Target
         """
-        self.X = np.array(X)
-        self.y = np.array(y)
+        Fits the data and calculates the coefficients of the linear regression
+
+        Parameters
+        ----------
+        X : Matrix2D
+            Data
+        y : Vector
+            Target
+        """
+        
+        self.X = np.asarray(X)
+        self.y = np.asarray(y)
         X, y = self.X, self.y
 
         if len(X.shape) == 1 or X.shape[1:] == np.ones(X.shape[1:]).all():
@@ -31,10 +37,15 @@ class LinearRegression:
             self.uni_dim = False
     
     def coef_(self) -> Vector:
-        """Returns the coefficients
-        Returns:
-            Vector: The vector of coefficients
         """
+        Returns the coefficients
+
+        Returns
+        -------
+        Vector
+            The vector of coefficients
+        """
+        
         return self.coeffs
     
     def intercept_(self) -> float:
