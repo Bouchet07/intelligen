@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .functions import erf
-
+#from .functions import erf
+from math import erf
 from typing import List, Union
 Vector = List[float]
 
 from numpy import pi, sqrt
-from ..numeric import factorial, combination
+from numeric import factorial, combination
 
 __all__ = ['Distribution', 'DiscreteDistribution',
            'Bernoulli', 'Binomial', 'Geometric',
@@ -15,13 +15,12 @@ __all__ = ['Distribution', 'DiscreteDistribution',
 
 #---------------------- Distributions -----------------------#
 
-
 class Distribution:
     """Main class for plotting distributions
     """
 
-    
-    def plot_CDF(self, show = True) -> None:
+
+    def plot_cdf(self, show = True) -> None:
         """Plots the Cumulative distribution function of a distribution
 
         Args:
@@ -61,7 +60,7 @@ class Distribution:
 
 class DiscreteDistribution(Distribution):
     
-    def PMF(k: float) -> float:
+    def pmf(self, k: float) -> float:
         """
         Probability Mass Function
         =========================
@@ -94,7 +93,7 @@ class DiscreteDistribution(Distribution):
             Cumulative probability
         """
 
-    def plot_PMF(self, show = True) -> None:
+    def plot_pmf(self, show = True) -> None:
         """Plots the Probability mass function of a distribution
 
         Args:
@@ -107,7 +106,7 @@ class DiscreteDistribution(Distribution):
         plt.title(f'Probability mass function\n{dist_name}')
         data = []
         for i in range(self.plot + 1):
-            data.append(self.PMF(i))
+            data.append(self.pmf(i))
         plt.plot(data)
         if show: plt.show()
 
@@ -146,7 +145,7 @@ class Bernoulli(DiscreteDistribution):
     --------
     >>> from intelligen.stats import Bernoulli
     >>> B = Bernoulli(0.65)
-    >>> B.PMF(0)
+    >>> B.pmf(0)
     0.35
     >>> B.skewness
     -0.6289709020331511
@@ -188,16 +187,32 @@ class Bernoulli(DiscreteDistribution):
         
 
 
-    def PMF(self, k: int) -> float:
-        if   k == 0: return self.q
-        elif k == 1: return self.p
-        else: print('R{0,1}')
-    
-    def CDF(self, k: float) -> float:
-        if   k < 0: return 0
-        elif k < 1: return self.q
-        else: return 1
+    def pmf(self, k: int) -> float:
+        if isinstance(k, list) or type(k) == np.ndarray:
+            return np.array([self.pmf(i) for i in k])
+        else:
+            if   k == 0: return self.q
+            elif k == 1: return self.p
+            else: raise ValueError('R{0,1}')
 
+    def cdf(self, k: float) -> float:
+        if isinstance(k, list) or type(k) == np.ndarray:
+            return np.array([self.cdf(i) for i in k])
+        else:
+            if   k < 0: return 0
+            elif k < 1: return self.q
+            else: return 1
+
+    def plot_pmf(self, show=True):
+        plt.title(f'Probability mass function\nBernoulli')
+        bar_plot = plt.bar([0,1],self.pmf([1,0]), width=0.4)
+        plt.bar_label(bar_plot,['p','1-p'])
+        if show: plt.show()
+    
+    def plot_cdf(self, show=True):
+        plt.title(f'Cumulative distribution function\nBernoulli')
+        plt.step([-1,0,1,2],self.cdf([-1,0,1,2]), where='post')
+        if show: plt.show()
 
 class Binomial(DiscreteDistribution):
     """
@@ -237,7 +252,7 @@ class Binomial(DiscreteDistribution):
     --------
     >>> from intelligen.stats import Binomial
     >>> B = Binomial(17, 0.65)
-    >>> B.PMF(10)
+    >>> B.pmf(10)
     0.1684553555671748
     >>> B.kurtosis
     -0.09437621202327084
@@ -269,14 +284,25 @@ class Binomial(DiscreteDistribution):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(n={self.n}, p={self.p})'
 
-    def PMF(self, k: int) -> float:
+    def pmf(self, k: int) -> float:
+        if isinstance(k, list) or type(k) == np.ndarray:
+            k = np.asarray(k).astype(int)
+            print(k)
+            #return np.array([self.pmf(i) for i in k])
+        
         return combination(self.n, k) * self.p**k * (1 - self.p)**(self.n - k) 
 
-    def CDF(self, k: float) -> float:
-        result = 0
-        for i in range(int(np.floor(k))+1):
-            result += combination(self.n, i) * self.p**i * (1 - self.p)**(self.n - i)
-        return result
+    def cdf(self, k: float) -> float:
+        if isinstance(k, list) or type(k) == np.ndarray:
+            return np.array([self.cdf(i) for i in k])
+        else:
+            result = 0
+            for i in range(int(np.floor(k))+1):
+                result += combination(self.n, i) * self.p**i * (1 - self.p)**(self.n - i)
+            return result
+
+B = Binomial(10,0.5)
+print(B.pmf([5,4]))
 
 class Geometric(DiscreteDistribution):
     """
@@ -350,7 +376,7 @@ class Geometric(DiscreteDistribution):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(p={self.p})'
 
-    def PMF(self, k: int or Vector) -> float:
+    def pmf(self, k: int or Vector) -> float:
         if isinstance(k, int):
             return (1 - self.p)**(k - 1) * self.p
         return (1 - self.p)**(np.array(k) - 1) * self.p
@@ -428,7 +454,7 @@ class NegativeBinomial(DiscreteDistribution):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(r={self.r}, p={self.p})'
 
-    def PMF(self, k: int) -> float:
+    def pmf(self, k: int) -> float:
         return combination(k + self.r - 1, k) * (1 - self.p)**self.r * self.p**k
     
     def CDF(self, k: float) -> float:
@@ -438,7 +464,7 @@ class Hypergeometric(DiscreteDistribution):
     def __init__(self, N: int, n: int, r: int) -> None:
         self.N, self.n, self.r, self.plot = N, n, r, r
 
-    def PMF(self, k: int) -> float:
+    def pmf(self, k: int) -> float:
         return combination(self.r, k) * combination(self.N - self.r, self.n - k) / combination(self.N, self.n)
 
 
@@ -448,7 +474,7 @@ class Poisson(DiscreteDistribution):
         self.l = l
         if plot is None: self.plot = int(l*2) + 5
     
-    def PMF(self, k: int) -> float:
+    def pmf(self, k: int) -> float:
         return np.exp(-self.l) * self.l**k / factorial(k)
 
 class Normal(Distribution):
@@ -456,7 +482,7 @@ class Normal(Distribution):
     def __init__(self, mu: float = 0, s: float = 1) -> None:
         self.mu, self.s, self.plot, self.origin = mu, s, 3*(s+1), mu
     
-    def PDF(self, k: float) -> float:
+    def pmf(self, k: float) -> float:
         return np.exp((-1/2) * ((k - self.mu)/self.s)**2) / (self.s * np.sqrt(2*np.pi))
     
     def CDF(self, x: float) -> float:

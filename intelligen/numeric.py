@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable, List, Union
 Function = Callable[[float], float]
 Vector_int = List[int]
-from .constants import golden, igolden
+from constants import golden, igolden
 
 
 def fibonacci(n: int, list: bool = False, start_points: Vector_int = None) -> int:
@@ -84,20 +84,14 @@ def factorial(n: Union[int, Vector_int]) -> Union[int, Vector_int]:
             result *= i
         return result
     else:
-        return_ndarray = False
-        if type(n) is np.ndarray: 
-            n = list(n)
-            return_ndarray = True
+        if type(n) is np.ndarray: n = list(n)    
 
         result = [1 for e in n]
         for i, e in enumerate(n):
             for j in range(2, e+1):
                 result[i] *= j
-
-        if return_ndarray:
-            return np.array(result)
-        return result
-
+  
+        return np.asarray(result)
 
 def combination(n: int, k: Union[int, Vector_int]) -> Union[int, Vector_int]:
     """
@@ -117,20 +111,13 @@ def combination(n: int, k: Union[int, Vector_int]) -> Union[int, Vector_int]:
     int, Vector_int
         number of combinations
     """
-    if isinstance(k, int):
-        return int(factorial(n) / (factorial(k)*factorial(n-k)))
-
+    if isinstance(k, list) or type(k) == np.ndarray:
+        return np.array([combination(n,i) for i in k])
     else:
-        return_list = False
-        if isinstance(k, list):
-            return_list = True
-
-        result = np.empty(len(k), dtype=int)
-        for i, e in enumerate(k):
-            result[i] = combination(n, int(e))
-
-        if return_list: return list(result)
-        return result
+        if isinstance(k, int):
+            return int(factorial(n) / (factorial(k)*factorial(n-k)))
+        else:
+            raise ValueError('k must be integer')
 
 
 def derivative(f: Function ,a: float, order: int=1, method: str='central', h: float=0.01):
