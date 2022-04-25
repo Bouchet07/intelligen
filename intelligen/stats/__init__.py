@@ -1,2 +1,2 @@
-from ..distributions import *
+from .distributions import *
 from .functions import *

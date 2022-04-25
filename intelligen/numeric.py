@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable, List, Union
 Function = Callable[[float], float]
 Vector_int = List[int]
-from constants import golden, igolden
+from .constants import golden, igolden
 
 
 def fibonacci(n: int, list: bool = False, start_points: Vector_int = None) -> int:

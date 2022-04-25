@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from .functions import erf
-from math import erf
+from intelligen.fortran.functions import erf
+#from math import erf
 from typing import List, Union
 Vector = List[float]
 
 from numpy import pi, sqrt
-from numeric import factorial, combination
+from ..numeric import factorial, combination
 
 __all__ = ['Distribution', 'DiscreteDistribution',
            'Bernoulli', 'Binomial', 'Geometric',
@@ -301,8 +301,8 @@ class Binomial(DiscreteDistribution):
                 result += combination(self.n, i) * self.p**i * (1 - self.p)**(self.n - i)
             return result
 
-B = Binomial(10,0.5)
-print(B.pmf([5,4]))
+""" B = Binomial(10,0.5)
+print(B.pmf([5,4])) """
 
 class Geometric(DiscreteDistribution):
     """
