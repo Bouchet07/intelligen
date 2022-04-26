@@ -26,7 +26,8 @@ setup_requirements = [ ]
 test_requirements = [ ]
 
 erf_extension = Extension('intelligen.fortran.functions',
-                          ['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'])
+                          ['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
+                          extra_link_args=["-static", "-static-libgfortran", "-static-libgcc"])
 
 setup(
     author="Diego Bouchet",
