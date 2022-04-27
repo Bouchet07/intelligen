@@ -25,8 +25,8 @@ setup_requirements = [ ]
 
 test_requirements = [ ]
 
-erf_extension = Extension('intelligen.fortran.functions',
-                          ['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
+erf_extension = Extension(name='intelligen.fortran.functions',
+                          sources=['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
                           extra_link_args=["-static", "-static-libgfortran", "-static-libgcc"])
 
 setup(
@@ -58,7 +58,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Bouchet07/intelligen',
-    version='0.12.1',
+    version='0.12.0',
     zip_safe=False,
     ext_modules=[erf_extension],
 )
