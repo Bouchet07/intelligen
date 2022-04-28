@@ -1,5 +1,5 @@
 import numpy as np
-from intelligen.fortran.functions import erf as erf_fortran
+from ..fortran.functions import erf as erf_fortran
 
 from typing import List, Union
 Vector = List[float]
