@@ -2,7 +2,7 @@
 
 __author__ = """Diego Bouchet"""
 __email__ = 'diegobouchet88@gmail.com'
-__version__ = '0.12.2'
+__version__ = '0.12.3'
 
 submodules = [
         'AI',
