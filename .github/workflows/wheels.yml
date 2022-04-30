@@ -13,42 +13,55 @@ jobs:
         os: [ubuntu-20.04, windows-2019, macOS-10.15]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Used to host cibuildwheel
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
 
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.4.0
 
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir dist
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
+        env:
+          CIBW_BEFORE_BUILD: pip install certifi oldest-supported-numpy
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
-          path: ./wheelhouse/*.whl
+          path: ./dist/*.whl
 
 
-  deploy:
+  make_sdist:
+      name: Make SDist
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v3
 
-    runs-on: ubuntu-latest
+      - name: Build SDist
+        run: pipx run build --sdist
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine numpy
-    - name: Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERS }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.tar.gz
+
+  upload_pypi:
+      needs: [build_wheels, build_sdist]
+      runs-on: ubuntu-latest
+      # upload to PyPI on every tag starting with 'v'
+      #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      # alternatively, to publish when a GitHub Release is created, use the following rule:
+      if: github.event_name == 'release' && github.event.action == 'published'
+      steps:
+        - uses: actions/download-artifact@v2
+          with:
+            name: artifact
+            path: dist
+
+        - uses: pypa/gh-action-pypi-publish@v1.4.2
+          with:
+            user: ${{ secrets.PYPI_USERS }}
+            password: ${{ secrets.PYPI_PASSWORD }}
+            # To test: repository_url: https://test.pypi.org/legacy/
