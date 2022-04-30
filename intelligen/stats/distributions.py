@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..fortran.functions import erf
+#from ..fortran.functions import erf
+#from intelligen.fortran.functions import erf
+from .functions import erf
 #from math import erf
 from typing import List, Union
 Vector = List[float]
