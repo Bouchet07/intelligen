@@ -8,7 +8,6 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         #os: [ubuntu-latest, windows-latest, macos-latest]
@@ -48,6 +47,7 @@ jobs:
         #   CIBW_SOME_OPTION: value
         env:
           CIBW_BEFORE_BUILD: pip install certifi oldest-supported-numpy
+          CIBW_BUILD: cp36-* cp37-* cp38-* cp39-* cp310-*
 
       - uses: actions/upload-artifact@v3
         with:
