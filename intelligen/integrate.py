@@ -335,18 +335,18 @@ def odeEuler(f: Function2d, t0: float, tfin: float, N: int, y0: Union[float, Vec
     f : Function2d
         Right-hand side of the differential equation `y' = f(t,y), y(t0) = y0`
     t0 : float
-        _description_
+        Initial time 
     tfin : float
-        _description_
+        Final time
     N : int
-        _description_
+        Number of partitions
     y0 : float
-        _description_
+        Initial value
 
     Returns
     -------
     Tuple[Vector, Vector]
-        _description_
+        The time and value vectors of the solution
     
     Examples
     --------
@@ -420,13 +420,13 @@ def slope_field(f: Function2d, range: list = None,
         by default 'quiver'
 
     density : int, optional
-        _description_, by default 20
+        Density of arrows, by default 20
 
     color : bool, optional
-        _description_, by default True
+        Color of the arrows, by default True
         
     show : bool, optional
-        _description_, by default True
+        Shows the plot, by default True
 
     cmap : str, optional
         https://matplotlib.org/stable/tutorials/colors/colormaps.html
