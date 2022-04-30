@@ -9,8 +9,10 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      continue-on-error: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        #os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest]
         gcc_v: [10]
     env:
       FC: gfortran-${{ matrix.gcc_v }}
