@@ -6,6 +6,7 @@ import io
 from os import path as op
 from setuptools import find_packages
 from numpy.distutils.core import Extension, setup
+import sys
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -26,8 +27,8 @@ setup_requirements = [ ]
 test_requirements = [ ]
 
 erf_extension = Extension(name='intelligen.fortran.functions',
-                          sources=['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf']
-                          )
+                          sources=['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
+                          extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else [])
 
 setup(
     author="Diego Bouchet",
