@@ -28,7 +28,8 @@ test_requirements = [ ]
 
 erf_extension = Extension(name='intelligen.fortran.functions',
                           sources=['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
-                          extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else [])
+                          extra_link_args=["-static", "-static-libgfortran", "-static-libgcc"])
+                          #extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else [])
 
 setup(
     author="Diego Bouchet",
