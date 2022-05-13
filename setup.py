@@ -4,8 +4,7 @@
 
 import io
 from os import path as op
-from setuptools import find_packages
-from numpy.distutils.core import Extension, setup
+from setuptools import find_packages, setup
 import sys
 
 with open('README.md') as readme_file:
@@ -25,11 +24,6 @@ requirements = [ ]
 setup_requirements = [ ]
 
 test_requirements = [ ]
-
-erf_extension = Extension(name='intelligen.fortran.functions',
-                          sources=['intelligen/fortran/erf.f', 'intelligen/fortran/erf.pyf'],
-                          extra_link_args=["-static", "-static-libgfortran", "-static-libgcc"],
-                          extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else [])
 
 setup(
     author="Diego Bouchet",
@@ -62,5 +56,4 @@ setup(
     url='https://github.com/Bouchet07/intelligen',
     version='0.12.21',
     zip_safe=False,
-    ext_modules=[erf_extension],
 )

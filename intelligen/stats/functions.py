@@ -1,5 +1,5 @@
 import numpy as np
-from intelligen.fortran.functions import erf as erf_fortran
+from math import erf as erf_math
 
 from typing import List, Union
 Vector = List[float]
@@ -49,10 +49,10 @@ def erf(x: Union[float, Vector]) -> Union[float, Vector]:
         Error function at x
     """
     
-    try:
-        return erf_fortran(x).item()
-    except:
-        return erf_fortran(x)
+    if isinstance(x, list) or type(x) == np.ndarray:
+        return np.array([erf_math(xi) for xi in x])
+    else:
+        return erf_math(x)
 
 def erfc(x: Union[float, Vector]) -> Union[float, Vector]:
     """
