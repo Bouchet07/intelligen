@@ -1,124 +1,7 @@
 import numpy as np
-from typing import Callable, List, Union
-Function = Callable[[float], float]
-Vector_int = List[int]
-from .constants import golden, igolden
-
-
-def fibonacci(n: int, list: bool = False, start_points: Vector_int = None) -> int:
-    """
-    Fibonacci Numbers
-    =================
-    In mathematics, the Fibonacci numbers, commonly denoted Fn,
-    form a sequence, the Fibonacci sequence, in which each number
-    is the sum of the two preceding ones.
-
-    Parameters
-    ----------
-    n : int
-        nth element of the Fibonacci sequence
-    list : bool, optional
-        Shows the whole sequence until nth number, by default False
-    start_points : Vector_int, optional
-        Initial numbers of the sequence, by default [0, 1]
-
-    Returns
-    -------
-    int
-        nth element of the Fibonacci sequence
-    """    """"""
-    if start_points is None: start_points = [0, 1]
-    f0, f1 = start_points
-
-    if list:
-        if n == 0: return [f0]
-        if n == 1: return [f0, f1]
-
-        F = start_points.copy()
-        if n > 0:
-            for i in range(1, n):
-                F.append(F[i] + F[i-1])
-        else:
-            for _ in range(-n):
-                F.insert(0, F[1] - F[0])
-
-        return F
-    else:
-        if n == 0: return f0
-        if n == 1: return f1
-
-        if n > 0:
-            for i in range(n-1):
-                f1, f0 = f1 + f0, f1
-            return f1
-        else:
-            for i in range(-n):
-                f0, f1 = f1 - f0, f0
-            return f0
-            # Another way:
-            #return (-1)**(n+1) * fibonacci(-n)
-            
-def binet(n: float):
-    return (golden**n - igolden**n)/np.sqrt(5)
-
-def factorial(n: Union[int, Vector_int]) -> Union[int, Vector_int]:
-    """
-    Factorial
-    =========
-    Returns the factorial of an integer `n! -> n*(n-1)*...*1`
-
-    Parameters
-    ----------
-    n: int, Vector_int
-        The number, or list of numbers to perform the factorial
-
-
-    Returns
-    -------
-    int, Vector_int
-        Factorial
-    """
-    if isinstance(n, int):
-        result = 1
-        for i in range(2, n+1):
-            result *= i
-        return result
-    else:
-        if type(n) is np.ndarray: n = list(n)    
-
-        result = [1 for e in n]
-        for i, e in enumerate(n):
-            for j in range(2, e+1):
-                result[i] *= j
-  
-        return np.asarray(result)
-
-def combination(n: int, k: Union[int, Vector_int]) -> Union[int, Vector_int]:
-    """
-    Combination
-    ===========
-    Returns the number of combinations for a set of n items in k selected items
-
-    Parameters
-    ----------
-    n: int
-        total number of items
-    k: int, Vector_int
-        selected number of items
-
-    Returns
-    -------
-    int, Vector_int
-        number of combinations
-    """
-    if isinstance(k, list) or type(k) == np.ndarray:
-        return np.array([combination(n,i) for i in k])
-    else:
-        if isinstance(k, int):
-            return int(factorial(n) / (factorial(k)*factorial(n-k)))
-        else:
-            raise ValueError('k must be integer')
-
+from intelligen.special import comb as combination
+from intelligen.special.typings import *
+from intelligen.constants import golden, igolden
 
 def derivative(f: Function ,a: float, order: int=1, method: str='central', h: float=0.01):
     '''
@@ -139,7 +22,7 @@ def derivative(f: Function ,a: float, order: int=1, method: str='central', h: fl
             backward: `f(a) - f(a-h))/h`
 
             by default 'central'
-        Information about higher order https://en.wikipedia.org/wiki/Finite_difference
+        [Information about higher order](https://en.wikipedia.org/wiki/Finite_difference)
 
     h : float
         Step size in difference formula,

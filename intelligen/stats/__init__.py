@@ -1,2 +1,2 @@
-from .distributions import *
-from .functions import *
+from .discrete_dist import *
+from .continuous_dist import *

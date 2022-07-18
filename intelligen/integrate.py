@@ -1,10 +1,6 @@
+from .special.typings import *
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import List, Tuple, Callable, Union
-
-Vector = List[float]
-Function = Callable[[float], float]
-Function2d = Callable[[float, float], float]
 
 def newton_cotes(y: Vector=None, x: Vector=None, formula: str='trapz', h: float=1,
                  f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
@@ -429,7 +425,7 @@ def slope_field(f: Function2d, range: list = None,
         Shows the plot, by default True
 
     cmap : str, optional
-        https://matplotlib.org/stable/tutorials/colors/colormaps.html
+        see [colormaps](https://matplotlib.org/stable/tutorials/colors/colormaps.html)
 
     Examples
     --------

@@ -1,10 +1,8 @@
-from typing import List
-Vector = List[float]
-Matrix2D = List[Vector]
+from .special.typings import *
 
 import numpy as np
 import matplotlib.pyplot as plt
-from .stats import mean_squared_error
+from .metrics import mean_squared_error
 
 # Bibliography https://github.com/arseniyturin/SGD-From-Scratch/blob/master/Gradient%20Descent.ipynb
 
@@ -275,4 +273,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     from time import time
+    print('hola desde linregress')
     main()

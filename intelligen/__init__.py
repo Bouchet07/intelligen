@@ -10,10 +10,13 @@ submodules = [
         'integrate',
         'intelligen',
         'interpolate',
+        'linear_model',
         'linregress',
+        'metrics',
         'numeric',
         'signals',
-        'stats'
+        'stats',
+        'special'
     ]
 
 __all__ = submodules
@@ -23,7 +26,10 @@ from . import constants
 from . import integrate
 from . import intelligen
 from . import interpolate
+from . import linear_model
 from . import linregress
+from . import metrics
 from . import numeric
 from . import signals
 from . import stats
+from . import special
