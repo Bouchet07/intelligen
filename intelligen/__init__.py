@@ -1,8 +1,8 @@
 """Top-level package for intelligen."""
 
-__author__ = """Diego Bouchet"""
-__email__ = 'diegobouchet88@gmail.com'
-__version__ = '0.13.0'
+from importlib import metadata
+
+__version__ = metadata.version("intelligen")
 
 submodules = [
         'AI',

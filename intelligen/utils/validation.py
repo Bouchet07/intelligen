@@ -4,7 +4,7 @@
 import numbers
 import numpy as np
 import warnings
-from numpy.core.numeric import ComplexWarning  # type: ignore
+from numpy.exceptions import ComplexWarning
 
 
 def _object_dtype_isnan(X):

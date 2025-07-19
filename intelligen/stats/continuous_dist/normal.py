@@ -6,7 +6,7 @@ from functools import cached_property
 __all__ = ['Normal']
 
 class Normal(ABCContinousDistribution):
-    """
+    r"""
     Normal Distribution
     ===================
 

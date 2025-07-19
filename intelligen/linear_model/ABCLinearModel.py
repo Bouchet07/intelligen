@@ -107,8 +107,11 @@ class LinearModel:
             ax.scatter(X, y, c='#325aa8', s=15, label='Data')
             # ax.legend()
 
+
         elif self.n_features_in_ == 2:
-            if ax is None: ax = plt.gca(projection = '3d')
+            if ax is None:
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
             ax.set_title('Multiple Linear Regression')
 
             min_x = np.min(self.X, axis = 0)

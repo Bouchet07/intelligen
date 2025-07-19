@@ -10,7 +10,7 @@ class TestNumeric(unittest.TestCase):
     """Tests for `intelligen` package."""
 
     def test_newton(self):
-        z = numeric.newton(f, df, 1, 0.01, True)[0]
+        z = numeric.newton(f, 1, 0.01, True)[0]
         self.assertAlmostEqual(z, ROOT, 3)
 
     def test_bisection(self):
@@ -26,7 +26,7 @@ class TestNumeric(unittest.TestCase):
         self.assertAlmostEqual(z, ROOT, 3)
     
     def test_newton(self):
-        z = numeric.newton2(f, df, ddf, 1, 0.01, True)[0]
+        z = numeric.newton2(f, 1, 0.01, True)[0]
         self.assertAlmostEqual(z, ROOT, 3)
 
 if __name__ == '__main__':

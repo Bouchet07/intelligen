@@ -1,5 +1,68 @@
 [build-system]
-build-backend = 'setuptools.build_meta'
-requires = [
-    'setuptools >= 43.0.0',
-    ]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intelligen"
+version = "0.13.0" # This version is now managed by bump-my-version
+authors = [
+    { name = "Diego Bouchet", email = "diegobouchet88@gmail.com" }
+]
+description = "This is a Python package for math and artificial intelligence tools"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+keywords = ["intelligen"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib"
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "flake8>=3.8.0",
+    "bump-my-version>=0.1.0",
+    "pytest>=6.0.0",
+    "pytest-cov>=2.10.0",
+]
+docs = [
+    "sphinx>=3.0.0",
+    "sphinx-rtd-theme>=0.5.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Bouchet07/intelligen"
+"Documentation" = "https://Bouchet07.github.io/intelligen"
+"Repository" = "https://github.com/Bouchet07/intelligen"
+"Bug Tracker" = "https://github.com/Bouchet07/intelligen/issues"
+
+[tool.setuptools.packages.find]
+include = ["intelligen", "intelligen.*"]
+
+# --- Tool Configurations ---
+
+# Configuration for Flake8 (linter)
+[tool.flake8]
+exclude = ["docs"]
+
+[tool.bump-my-version]
+current_version = "0.13.0"
+commit = true
+tag = true
+
+[[tool.bump-my-version.files]]
+filename = "pyproject.toml"
+search = 'current_version = "{current_version}"'
+replace = 'current_version = "{new_version}"'
