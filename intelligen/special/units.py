@@ -1,8 +1,9 @@
-from .typings import *
 # from typing import Union, List
 # from numbers import Real
 # Vector = List[Real]
 from ..constants import *
+from .typings import *
+
 
 def convert(x: Union[Real, Vector], ini_units: str, fin_units: str) -> Union[Real, Vector]:
     """
@@ -125,15 +126,14 @@ def convert(x: Union[Real, Vector], ini_units: str, fin_units: str) -> Union[Rea
             mth: -> month (30 days)
             y: -> year (365 days)
     """
-
     length = ['m',                                                       #SI
               'A', 'si', 'xu',                                           #Non-SI
               'th', 'in', 'ft', 'yd', 'mi', 'lg',                        #Imperial/US
               'fm', 'nmi',                                               #Marine
               'ch', 'rod',                                               #Surveying
               'er', 'ld', 'au', 'ly', 'pc', 'hl',                        #Astronomy
-              're', 'lc', 'rlc', 'a0', '1/r', 'lp', 'ls', 'lqcd', 'eV-1']#Physics   
-    
+              're', 'lc', 'rlc', 'a0', '1/r', 'lp', 'ls', 'lqcd', 'eV-1']#Physics
+
     mass = ['kg',       #SI
             't', 'da',  #Non-SI
             'sl', 'lb', #Imperial/US
@@ -272,7 +272,7 @@ def convert(x: Union[Real, Vector], ini_units: str, fin_units: str) -> Union[Rea
     #Non-SI
     elif fin_units == 'C': return Kelvin - 273.15
     elif fin_units == 'F': return 9/5*Kelvin - 459.67
-    elif fin_units == 'R': return 9/5*Kelvin 
+    elif fin_units == 'R': return 9/5*Kelvin
     elif fin_units == 'De': return 3/2*(373.15 - Kelvin)
     elif fin_units == 'N': return 33/100*(Kelvin - 273.15)
     elif fin_units == 'Re': return 4/5*(Kelvin - 273.15)

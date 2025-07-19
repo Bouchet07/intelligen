@@ -1,16 +1,18 @@
 import abc
-import numpy as np
-import matplotlib.pyplot as plt
 
-from intelligen.utils.validation import check_array
+import matplotlib.pyplot as plt
+import numpy as np
+
 from ..metrics import mean_squared_error, r2_score
 
+
 class LinearModel:
+    """Abstract base class for linear models."""
 
     @abc.abstractmethod
     def fit(self, X, y):
         """Fit model."""
-    
+
     def check_is_fitted(self):
         if not hasattr(self, '_fitted'): raise ValueError(
             f"This {self.__class__.__name__} instance is not fitted yet. Call 'fit' with "
@@ -33,16 +35,20 @@ class LinearModel:
         """
         self.check_is_fitted()
         if X is None: X = self.X
-        else: X = check_array(X)
+
         return X @ self.coef_.T + self.intercept_
-    
+
     def mse(self, y_true = None, y_pred = None, multioutput='uniform_average') -> float:
-        """Returns the mean squared error
-        Args:
-            y_real (Vector, optional): Real data. Defaults to None (takes the fitted data)
-            y_pred (Vector, optional): Predicted data. Defaults to None (takes the predicted data)
-        Returns:
-            float: Mean squared error
+        """Return the mean squared error.
+
+        Parameters
+        ----------
+            y_real (Vector, optional): Real data. Defaults to None (takes the fitted data).
+            y_pred (Vector, optional): Predicted data. Defaults to None (takes the predicted data).
+
+        Returns
+        -------
+            float: Mean squared error.
         """
         self.check_is_fitted()
         if y_true is None: y_true = self.y
@@ -51,14 +57,16 @@ class LinearModel:
 
     def score(self, y_true = None, y_pred = None, multioutput='uniform_average'):
         """Return the coefficient of determination of the prediction.
-        The coefficient of determination :math:`R^2` is defined as
-        :math:`(1 - \\frac{u}{v})`, where :math:`u` is the residual
-        sum of squares ``((y_true - y_pred)** 2).sum()`` and :math:`v`
-        is the total sum of squares ``((y_true - y_true.mean()) ** 2).sum()``.
-        The best possible score is 1.0 and it can be negative (because the
-        model can be arbitrarily worse). A constant model that always predicts
-        the expected value of `y`, disregarding the input features, would get
-        a :math:`R^2` score of 0.0.
+
+        Parameters
+        ----------
+        y_true : array-like, shape (n_samples,) or (n_samples, n_targets)
+            True target values.
+
+        Returns
+        -------
+        float
+            The coefficient of determination R^2 of the prediction.
         """
         self.check_is_fitted()
         if y_true is None: y_true = self.y
@@ -66,13 +74,20 @@ class LinearModel:
         return r2_score(y_true, y_pred, multioutput=multioutput)
 
     def plot(self, ax=None, p_data = 1, n_data = 100) -> plt.Axes:
-        """Plots the linear regression data against the real data
-        Args:
-            show (bool, optional): This shows the plot. Defaults to True.
-            delimeters (bool, optional): This shows the delimeters of the surface that is plot. Defaults to False.
+        """Plot the linear regression data against the real data.
+
+        Parameters
+        ----------
+            ax (plt.Axes, optional): The axes to plot on. Defaults to None (creates a new one).
+            p_data (float, optional): Percentage of data to use for plotting. Defaults to 1 (100%).
+            n_data (int, optional): Number of data points to plot. Defaults to 100.
+
+        Returns
+        -------
+            plt.Axes: The axes with the plot.
         """
         self.check_is_fitted()
-        if self.y.ndim != 1: raise ValueError(f'multitarget is not supported at the moment')
+        if self.y.ndim != 1: raise ValueError('multitarget is not supported at the moment')
         X = self.X
         y = self.y
         if p_data != 1:
@@ -81,12 +96,12 @@ class LinearModel:
             G = np.random.default_rng()
             index = G.choice(np.arange(len(y)), size=size, replace=False, shuffle=False)
             X, y = X[index], y[index]
-        
+
         if len(y) > n_data:
             G = np.random.default_rng()
             index = G.choice(np.arange(len(y)), size=n_data, replace=False, shuffle=False)
             X, y = X[index], y[index]
-        
+
         if self.n_features_in_ == 1:
             if ax is None: ax = plt.gca()
             ax.set_title('Simple Linear Regression')
@@ -96,7 +111,7 @@ class LinearModel:
             min_x, max_x = np.min(self.X), np.max(self.X)
             # ax.set_xlim(min_x, max_x)
             min_y_pred, max_y_pred = self.predict(np.array([[min_x],[max_x]]))
-            
+
             # ax.set_xmargin(10)
             # ax.set_ymargin(10)
 

@@ -1,6 +1,8 @@
-from .special.typings import *
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from .special.typings import *
+
 
 def newton_cotes(y: Vector=None, x: Vector=None, formula: str='trapz', h: float=1,
                  f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
@@ -62,28 +64,28 @@ def newton_cotes(y: Vector=None, x: Vector=None, formula: str='trapz', h: float=
     1.1940051049177476
 
     """
-    if   formula == 'trapz': 
+    if   formula == 'trapz':
         n, fs = 1, '(y[i] + y[i+1]) * d[i]/2'
     elif formula == 'simpson':
         n, fs = 2, '(y[n*i] + 4*y[n*i + 1] + y[n*i + 2]) * d[i]/3'
-    elif formula == 'simpson3_8': 
+    elif formula == 'simpson3_8':
         n, fs = 3, '(y[n*i] + 3*y[n*i + 1] + 3*y[n*i + 2] + y[n*i + 3]) * 3*d[i]/8'
-    elif formula == 'boole': 
+    elif formula == 'boole':
         n, fs = 4, '(7*y[n*i] + 32*y[n*i + 1] + 12*y[n*i + 2] + 32*y[n*i + 3] + 7*y[n*i + 4]) * 2*d[i]/45'
-    elif formula == 'weddle': 
+    elif formula == 'weddle':
         n, fs = 6, '(y[n*i] + 5*y[n*i + 1] + y[n*i + 2] + 6*y[n*i + 3] + y[n*i + 4] + 5*y[n*i + 5] + y[n*i + 6]) * 3*d[i]/10'
     else: raise ValueError('Wrong formula')
 
     if y is None and x is None:
-        if not all(p is not None for p in [f,a,b]): raise ValueError(f"If you don't define y/x you must define f,a and b")
+        if not all(p is not None for p in [f,a,b]): raise ValueError("If you don't define y/x you must define f,a and b")
         if N%n != 0: raise ValueError(f'{N=} must be divisible by {n=}')
         x = np.linspace(a,b,N+1)
-        y = f(x)   
-    
+        y = f(x)
+
     if (len(y)-1)%n != 0: raise ValueError(f'The length of the array y={len(y)} - 1 must be multiple of {n=} in order to divide the interval')
     nh = int((len(y)-1)/n)
 
-    if x is None: 
+    if x is None:
         d = np.array([h]*nh)
         # x is only for checking
         x = np.empty(len(y))
@@ -362,7 +364,7 @@ def odeEuler(f: Function2d, t0: float, tfin: float, N: int, y0: Union[float, Vec
     """
     if isinstance(y0, list) or type(y0) == np.ndarray:
         leny0 = len(y0)
-        
+
         T = np.tile(np.linspace(t0, tfin, N+1), (leny0,1))
         h = (tfin - t0) / N
 
@@ -440,23 +442,22 @@ def slope_field(f: Function2d, range: list = None,
     plot figure
 
     """
-    
     if range is None and xlim is None and ylim is None:
         range = [-5,5]
         x1, x2 = range
         y1, y2 = range
-    
+
     elif xlim is None and ylim is None:
         x1, x2 = range
         y1, y2 = range
-    
+
     elif range is None:
         x1, x2 = xlim
         y1, y2 = ylim
-    
+
     else:
         raise ValueError('Must speciefy either range or xlim/ylim')
-    
+
 
     x = np.linspace(x1, x2, density)
     y = np.linspace(y1, y2, density)
@@ -467,7 +468,7 @@ def slope_field(f: Function2d, range: list = None,
     if normalize:
         norm = np.sqrt(dx**2 + dy**2)
         dx, dy = dx/norm , dy/norm
-    
+
     if plot_type == 'quiver':
         #color = np.sqrt(((dx+4)/2)*2 + ((dy+4)/2)*2)
         if color: plt.quiver(X, Y, dx, dy, dy, cmap=cmap)
@@ -479,7 +480,7 @@ def slope_field(f: Function2d, range: list = None,
 
     else:
         raise ValueError("It only accepts either 'quiver' or 'streamplot'")
-    
+
     plt.title(f'Slope Field ({plot_type})')
     plt.xlabel('x')
     plt.ylabel('y')

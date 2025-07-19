@@ -1,10 +1,9 @@
 import numpy as np
+from scipy.special import comb, erf, erfc, erfi, erfinv, factorial
 
-
-from ..typings import *
 #from constants import golden, igolden
 from ...constants import *
-from scipy.special import erf, erfc, erfi, erfinv, factorial, comb
+from ..typings import *
 
 __all__ = ['erf', 'erfc', 'erfi', 'erfinv', 'factorial', 'comb',
            'fibonacci', 'binet']
@@ -61,7 +60,7 @@ def fibonacci(n: int, list: bool = False, start_points: Vector_int = None) -> in
             return f0
             # Another way:
             #return (-1)**(n+1) * fibonacci(-n)
-            
+
 def binet(n: float):
     return (golden**n - igolden**n)/np.sqrt(5)
 

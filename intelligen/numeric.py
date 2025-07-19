@@ -1,10 +1,11 @@
 import numpy as np
+
 from intelligen.special import comb as combination
 from intelligen.special.typings import *
-from intelligen.constants import golden, igolden
+
 
 def derivative(f: Function ,a: float, order: int=1, method: str='central', h: float=0.01):
-    '''
+    """
     Derivative
     ========
     Compute the difference formula for `f'(a)` with step size `h`.
@@ -35,7 +36,7 @@ def derivative(f: Function ,a: float, order: int=1, method: str='central', h: fl
     -------
     float
         `f'(a)`      
-    '''
+    """
     i = np.arange(order+1)
     if method == 'central':
         return 1/h**order * np.sum((-1)**i * combination(order, i) * f(a + (order/2 - i)*h))
@@ -134,15 +135,15 @@ def bisection(f: Function, xi: float, xf: float, tol: float, iter: bool = False)
 
         while abs(f(xm)) > tol:
             if f(xi) * f(xm) < 0:
-                xf = xm 
+                xf = xm
                 n += 1
-            
+
             elif f(xm) * f(xf) < 0:
-                xi = xm 
+                xi = xm
                 n += 1
-            
+
             xm = (xi + xf) / 2
-            
+
         if iter:
             return xm, n
         return xm
@@ -196,7 +197,7 @@ def regula_falsi(f: Function, xi: float, xf: float, tol: float, iter: bool = Fal
             if f(xm) * f(xf) < 0:
                 xi = xm
                 n += 1
-            
+
             xm = (xi * f(xf) - xf * f(xi)) / (f(xf) - f(xi))
 
         if iter:
@@ -247,7 +248,7 @@ def secant(f: Function, x0: float, x1: float, tol: float, iter: bool = False) ->
         x0, x1 = x1, x2
         x2 = x1 - (f(x1) * (x1 - x0)) / (f(x1) - f(x0))
         n += 1
-        
+
     if iter:
         return x2, n
     return x2
@@ -316,9 +317,9 @@ def newton2(f: Function, x: float, tol: float, iter: bool = False) -> float:
             x = x1
         else:
             x = x2
-        
+
         n += 1
-    
+
     if iter:
         return x, n
     return x

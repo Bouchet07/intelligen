@@ -7,7 +7,7 @@ sigm = (
     lambda x: x* (1 - x)
 )
 
-    
+
 # FUNCIONES DE ACTIVACIÓN
 
 l2_cost = (
@@ -17,14 +17,14 @@ l2_cost = (
 
 
 class NeuralLayer:
-    
+
     def __init__(self, n_conn, n_neur, act_f):
-      
+
         self.act_f = act_f
 
         self.b = np.random.rand(n_neur)*2 -1
         self.W = np.random.rand(n_conn, n_neur)*2 -1
-    
+
     def forward(self, prev):
         z = prev[1] @ self.W + self.b
         a = self.act_f[0](z)
@@ -35,22 +35,22 @@ class NeuralNet:
 
     def __init__(self, topology, act_f) -> None:
        self.layers = [NeuralLayer(topology[l], topology[l+1], act_f) for l, _ in enumerate(topology[:-1])]
-    
+
     def __getitem__(self, i):
         return self.layers[i]
-    
+
     def __iter__(self):
         yield from self.layers
-    
+
     def __len__(self):
         return len(self.layers)
-    
+
     def predict(self, X):
         out = [(None,X)]
         for layer in self:
             z, a = layer.forward(out[-1])
             out.append((z,a))
-        
+
         return out
 
     def result(self, X):
@@ -74,7 +74,7 @@ class NeuralNet:
             _W = self[l].W
 
             # Gradient descent
-            self[l].b -= np.mean(deltas[0], axis=0)*lr # (n_neur,) - 
+            self[l].b -= np.mean(deltas[0], axis=0)*lr # (n_neur,) -
             self[l].W -= out[l][1].T @ deltas[0] * lr
 
         return out[-1][1]

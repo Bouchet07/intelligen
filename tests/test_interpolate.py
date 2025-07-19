@@ -1,6 +1,6 @@
 import unittest
+
 import numpy as np
-import matplotlib.pyplot as plt
 
 from intelligen import interpolate
 
@@ -15,10 +15,10 @@ Lagran = interpolate.lagrange(X.reshape(-1),Y.reshape(-1))
 
 class TestInterpolate(unittest.TestCase):
     """Tests for `intelligen` package."""
-    
+
     def test_lagrange(self):
         Lagran(_x)
-    
+
 
 if __name__ == '__main__':
     unittest.main()

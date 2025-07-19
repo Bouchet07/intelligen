@@ -1,6 +1,7 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from typing import List
+
+import numpy as np
+
 Vector = List[float]
 
 def heaviside(t: Vector) -> Vector:

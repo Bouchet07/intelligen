@@ -3,5 +3,5 @@
 To use intelligen in a project:
 
 ```
-import intelligen
+import intelligen as it
 ```

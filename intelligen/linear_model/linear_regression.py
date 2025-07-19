@@ -1,17 +1,13 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from ..metrics import mean_squared_error
-from ..utils.validation import _num_features, check_X_y
-from .ABCLinearModel import LinearModel
 from scipy.optimize import nnls
 
+from .ABCLinearModel import LinearModel
 
 # Bibliography https://github.com/arseniyturin/SGD-From-Scratch/blob/master/Gradient%20Descent.ipynb
 
 class LinearRegression(LinearModel):
     """
-    Ordinary least squares Linear Regression
-    ========================================
+    Ordinary least squares Linear Regression.
 
     LinearRegression fits a linear model with coefficients w = (w1, ..., wp)
     to minimize the residual sum of squares between the observed targets in
@@ -45,13 +41,14 @@ class LinearRegression(LinearModel):
     n_features_in_ : int
         Number of features seen during :term:`fit`.
     """
+
     def __init__(self, positive = False, implementation = 'numpy') -> None:
         self.positive = positive
         self.implementation = implementation
 
     def fit(self, X, y) -> None:
         """
-        Fits the data and calculates the coefficients of the linear regression
+        Fit the data and calculates the coefficients of the linear regression.
 
         Parameters
         ----------
@@ -60,10 +57,8 @@ class LinearRegression(LinearModel):
         y : Array-like, shape(n_samples,) or (n_samples, n_targets)
             Target
         """
-        
         # This only ensures X is 2D, y can be 1D
-        self.X, self.y = check_X_y(X, y)
-        self.n_features_in_ = _num_features(self.X)
+        self.n_features_in_ = X.shape[1] if X.ndim > 1 else 1
         X, y = self.X, self.y
 
         if self.positive:
@@ -77,7 +72,7 @@ class LinearRegression(LinearModel):
                 # slicing a column y[:,j] gives 1D array
                 temp = np.array([nnls(X, y[:,j])[0] for j in range(y.shape[1])])
                 self.intercept_, self.coef_ = temp[:,0], temp[:,1:]
-            
+
         else:
             if self.implementation == 'mine':
                 # Simple linear regression
@@ -88,7 +83,7 @@ class LinearRegression(LinearModel):
                         y = y.reshape(-1,1)
                     self.coef_ = (np.mean(X) * np.mean(y, axis=0) - np.mean(X*y, axis=0)) / ((np.mean(X)**2) - np.mean(X**2))
                     self.intercept_ = np.mean(y, axis=0) - self.coef_ * np.mean(X)
-                    
+
                     # Consistent reshaping
                     if len(self.coef_) != 1: self.coef_ = np.array(self.coef_).reshape(-1,1)
                     if len(self.intercept_) == 1: self.intercept_ = self.intercept_[0]
@@ -106,7 +101,7 @@ class LinearRegression(LinearModel):
                         self.intercept_, self.coef_ = temp[0], temp[1:]
                     else:
                         self.intercept_, self.coef_= temp[:,0], temp[:,1:]
-            
+
             elif self.implementation == 'numpy':
                 # We add the coefficient column
                 X = np.column_stack((np.ones(X.shape[0]), X))
@@ -117,7 +112,8 @@ class LinearRegression(LinearModel):
                 else:
                     self.intercept_, self.coef_= temp[:,0], temp[:,1:]
             else:
-                raise ValueError(f'{self.implementation} not supported, try numpy or mine')
+                raise ValueError(
+                    f'{self.implementation} not supported, try numpy or mine')
 
         self._fitted = True
         return self

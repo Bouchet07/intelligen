@@ -1,8 +1,8 @@
-from .special.typings import *
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from .metrics import mean_squared_error
+from .special.typings import *
 
 # Bibliography https://github.com/arseniyturin/SGD-From-Scratch/blob/master/Gradient%20Descent.ipynb
 
@@ -19,7 +19,6 @@ class LinearRegression:
         y : Vector
             Target
         """
-        
         self.X = np.asarray(X)
         self.y = np.asarray(y)
         X, y = self.X, self.y
@@ -33,7 +32,7 @@ class LinearRegression:
             self.coeffs = np.linalg.inv(X.T @ X) @ X.T @ y
             self.b = np.mean(y) - np.mean(X, axis=0) @ self.coeffs
             self.uni_dim = False
-    
+
     def coef_(self) -> Vector:
         """
         Returns the coefficients
@@ -43,9 +42,8 @@ class LinearRegression:
         Vector
             The vector of coefficients
         """
-        
         return self.coeffs
-    
+
     def intercept_(self) -> float:
         """Returns the intercept value
         Returns:
@@ -57,7 +55,9 @@ class LinearRegression:
         """Returns the predicted data once fitted
         Args:
             X (Matrix2D, optional): Data to predict. Defaults to None (takes the fitted data)
-        Returns:
+
+        Returns
+        -------
             Vector: The predicted data
         """
         if X is None: X = self.X
@@ -65,13 +65,15 @@ class LinearRegression:
         if self.uni_dim: self.y_pred = X * self.coeffs + self.b
         else: self.y_pred = X @ self.coeffs + self.b
         return self.y_pred
-    
+
     def mse(self, y_real: Vector = None, y_pred: Vector = None) -> float:
         """Returns the mean squared error
         Args:
             y_real (Vector, optional): Real data. Defaults to None (takes the fitted data)
             y_pred (Vector, optional): Predicted data. Defaults to None (takes the predicted data)
-        Returns:
+
+        Returns
+        -------
             float: Mean squared error
         """
         if y_real is None: y_real = self.y
@@ -138,12 +140,12 @@ class GradientDescent:
                 X = np.take(self.X, indexes)
                 y = np.take(self.y, indexes)
                 N = len(X)
-            
+
             f = y - (self.m * X + self.b)
             # Updating m and b
             self.m -= lr * ((-2 * X @ f).sum() / N)
             self.b -= lr * (-2 * f.sum() / N)
-            
+
             self.log.append((self.m, self.b))
             self.mse.append(mean_squared_error(self.y, (self.m * self.X + self.b)))
 
@@ -151,7 +153,9 @@ class GradientDescent:
         """Returns the predicted data once fitted
         Args:
             X (Vector, optional): Data to predict. Defaults to None (takes the fitted data)
-        Returns:
+
+        Returns
+        -------
             Vector: The predicted data
         """
         if X is None: X = self.X
@@ -179,25 +183,25 @@ class GradientDescent:
             axs[1].set_xlabel('Epochs')
             axs[1].set_ylabel('MSE')
 
-            if log: 
+            if log:
                 for i in range(len(self.log)):
                     axs[0].plot(self.X, self.log[i][0] * self.X + self.log[i][1], lw=1, c='orange', alpha=0.25)
-            
+
             axs[0].plot(self.X, self.y_pred, c='red')
             axs[0].scatter(self.X, self.y, c='#325aa8', s=15)
             if show: plt.show()
-        
+
         else:
             if self.sgd:
                 plt.title('Stochastic Gradient Descent Optimization')
             else:
                 plt.title('Gradient Descent Optimization')
             plt.ylim(min(self.y), max(self.y))
-            
-            if log: 
+
+            if log:
                 for i in range(len(self.log)):
                     plt.plot(self.X, self.log[i][0] * self.X + self.log[i][1], lw=1, c='orange', alpha=0.25)
-            
+
             plt.plot(self.X, self.y_pred, c='red')
             plt.scatter(self.X, self.y, c='#325aa8', s=15)
             if show: plt.show()
@@ -211,14 +215,16 @@ class GradientDescent:
         plt.plot(range(len(self.mse)), self.mse)
         plt.xlabel('Epochs')
         plt.ylabel('MSE')
-        if show: plt.show()       
+        if show: plt.show()
 
     def show_mse(self, y_real: Vector = None, y_pred: Vector = None) -> float:
         """Returns the mean squared error
         Args:
             y_real (Vector, optional): Real data. Defaults to None (takes the fitted data)
             y_pred (Vector, optional): Predicted data. Defaults to None (takes the predicted data)
-        Returns:
+
+        Returns
+        -------
             float: Mean squared error
         """
         if y_real is None: y_real = self.y
@@ -227,11 +233,11 @@ class GradientDescent:
 
 
 def main() -> None:
-    """ x = np.random.rand(1000) * 4 -2
+    """X = np.random.rand(1000) * 4 -2
     y = np.random.rand(1000) * 4 -2 
     X = np.array([x, y]).T
-    Y = x * np.exp(-x**2 - y**2) """
-    
+    Y = x * np.exp(-x**2 - y**2)
+    """
     X = np.random.rand(10000) * 4 -2
     Y = X + np.random.random(X.shape)*4
 

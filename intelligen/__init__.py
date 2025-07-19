@@ -1,35 +1,43 @@
+# ruff: noqa: F401
 """Top-level package for intelligen."""
 
 from importlib import metadata
 
+# These imports make submodules available to the user,
+# e.g., so they can access `intelligen.AI`. The `noqa`
+# comment at the top of the file tells Ruff this is intentional.
+from . import (
+    AI,
+    constants,
+    integrate,
+    intelligen,
+    interpolate,
+    linear_model,
+    linregress,
+    metrics,
+    numeric,
+    signals,
+    special,
+    stats,
+)
+
 __version__ = metadata.version("intelligen")
 
-submodules = [
-        'AI',
-        'constants',
-        'integrate',
-        'intelligen',
-        'interpolate',
-        'linear_model',
-        'linregress',
-        'metrics',
-        'numeric',
-        'signals',
-        'stats',
-        'special'
-    ]
+# Define the public API for when a user does `from intelligen import *`
+__all__ = [
+    "AI",
+    "constants",
+    "integrate",
+    "intelligen",
+    "interpolate",
+    "linear_model",
+    "linregress",
+    "metrics",
+    "numeric",
+    "signals",
+    "special",
+    "stats",
+    "__version__", # It's good practice to include __version__ in __all__
+]
 
-__all__ = submodules
 
-from . import AI
-from . import constants
-from . import integrate
-from . import intelligen
-from . import interpolate
-from . import linear_model
-from . import linregress
-from . import metrics
-from . import numeric
-from . import signals
-from . import stats
-from . import special

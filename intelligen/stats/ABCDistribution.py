@@ -1,20 +1,20 @@
 import abc
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.optimize as op
+from typing import Real
 
-from ..special.typings import Real, Vector, Union, Matrix2D
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.optimize as op
+from numpy.typing import ArrayLike
 
 
 class ABCDistribution(abc.ABC):
-    '''
-    A probability distribution is the mathematical function that gives the probabilities
-    of occurrence of different possible outcomes for an experiment.
+    """
+    A probability distribution is the mathematical function that gives the probabilities of occurrence of different possible outcomes for an experiment.
 
     Attributes
     ----------
     mean : float
-        Expected value / mean 
+        Expected value / mean
 
     variance : float
         Measure of dispersion
@@ -24,55 +24,44 @@ class ABCDistribution(abc.ABC):
 
     kurtosis: float
         Measure of the "tailedness"
-    '''
+    """
+
     @property
     @abc.abstractmethod
     def mean(self):
-        """
-        the expected value (also called expectation, mean, average, or first moment)
-        is a generalization of the weighted average.
-        """
+        """The expected value (also called expectation, mean, average, or first moment) is a generalization of the weighted average."""
         pass
 
     @property
     @abc.abstractmethod
     def variance(self):
-        """
-        variance is the expectation of the squared deviation of a random variable
-        from its population mean or sample mean. Variance is a measure of dispersion
-        """
+        """Variance is the expectation of the squared deviation of a random variable from its population mean or sample mean. Variance is a measure of dispersion."""
         pass
 
     @property
     @abc.abstractmethod
     def skewness(self):
-        """
-        skewness is a measure of the asymmetry of the probability distribution
-        of a real-valued random variable about its mean
-        """
+        """Skewness is a measure of the asymmetry of the probability distribution of a real-valued random variable about its mean."""
         pass
 
     @property
     @abc.abstractmethod
     def kurtosis(self):
-        """
-        kurtosis is a measure of the "tailedness" of the probability distribution
-        of a real-valued random variable
-        """
+        """Kurtosis is a measure of the "tailedness" of the probability distribution of a real-valued random variable."""
         pass
-    
+
     @abc.abstractmethod
-    def cdf(k: Union[Real,Vector]) -> Union[Real,Vector]:
+    def cdf(k: Real | ArrayLike) -> Real | ArrayLike:
         """
-        Cumulative Distribution Function
-        ================================
+        Cumulative Distribution Function.
+
         Returns the Cumulative distribution function P(X<=k)
 
         Parameters
         ----------
         k : Real / Vector
             Value
-        
+
         Returns
         -------
         Real / Vector:
@@ -80,11 +69,11 @@ class ABCDistribution(abc.ABC):
         """
         pass
 
-    
+
     # @abc.abstractmethod
     def plot_cdf(self, ax = None, limit=None, **kwargs) -> plt.axes:
-        """Plots the Cumulative distribution function of a distribution
-        
+        """Plot the Cumulative distribution function of a distribution.
+
         Returns
         -------
         plt.axes
@@ -97,34 +86,35 @@ class ABCDistribution(abc.ABC):
         ax.plot(x, self.cdf(x), **kwargs)
         ax.grid(True)
         return ax
-        
+
 
 Distribution = ABCDistribution
 
 class ABCDiscreteDistribution(ABCDistribution):
-    
+    """Abstract base class for discrete probability distributions."""
+
     @abc.abstractmethod
     def pmf(self, k):
         """
-        Probability Mass Function
-        =========================
+        Probability Mass Function.
+
         Returns the probability mass function P(X=k)
 
         Parameters
         ----------
         k : Real / Vector
             Value
-        
+
         Returns
         -------
         Real / Vector:
             Probability
         """
         pass
-    
+
     @abc.abstractmethod
     def plot_pmf(self) -> plt.axes:
-        """Plots the probability mass function
+        """Plot the probability mass function.
 
         Returns
         -------
@@ -136,9 +126,8 @@ class ABCDiscreteDistribution(ABCDistribution):
     @abc.abstractmethod
     def pdf(self, a, b):
         """
-        
-        Probability density function
-        ============================
+        Probability density function.
+
         Returns the Probability density function P(a<=X<=b)
 
         Parameters
@@ -154,23 +143,22 @@ class ABCDiscreteDistribution(ABCDistribution):
             Density probability
         """
         pass
-    
+
     # @abc.abstractmethod
     def plot_pdf(self, ax = None, limit=0.01) -> plt.axes:
-        """Plots the Probability density function of a distribution
-        
+        """Plot the Probability density function of a distribution.
+
         Returns
         -------
         plt.axes
             returns the axes of the plot
         """
         pass
-    
+
     @abc.abstractmethod
-    def mgf(self, t: Union[Real,Vector]) -> Union[Real,Vector]:
+    def mgf(self, t: Real | ArrayLike) -> Real | ArrayLike:
         """
-        Moment-generating function
-        ==========================
+        Moment-generating function.
 
         Parameters
         ----------
@@ -184,11 +172,10 @@ class ABCDiscreteDistribution(ABCDistribution):
         """
         pass
 
-    @abc.abstractmethod    
-    def cf(self, t: Union[Real,Vector]) -> Union[Real,Vector]:
+    @abc.abstractmethod
+    def cf(self, t: Real | ArrayLike) -> Real | ArrayLike:
         """
-        Characteristic function
-        =======================
+        Characteristic function.
 
         Parameters
         ----------
@@ -205,13 +192,13 @@ class ABCDiscreteDistribution(ABCDistribution):
 
 
 class ABCContinousDistribution(ABCDistribution):
-    
+    """Abstract base class for continuous probability distributions."""
+
     @abc.abstractmethod
     def pdf(self, x):
         """
-        
-        Probability density function
-        ============================
+        Probability density function.
+
         Returns the Probability density function P(a<=X<=b)
 
         Parameters
@@ -227,8 +214,8 @@ class ABCContinousDistribution(ABCDistribution):
 
     # @abc.abstractmethod
     def plot_pdf(self, ax = None, limit=0.01, **kwargs) -> plt.axes:
-        """Plots the Probability density function of a distribution
-        
+        """Plot the Probability density function of a distribution.
+
         Returns
         -------
         plt.axes
@@ -241,5 +228,6 @@ class ABCContinousDistribution(ABCDistribution):
         ax.plot(x, self.pdf(x), **kwargs)
         ax.grid(True)
         return ax
-        
+
+# type alias
 Distribution = ABCDistribution

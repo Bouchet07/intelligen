@@ -32,14 +32,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "flake8>=3.8.0",
+    "ruff>=0.5.0",
     "bump-my-version>=0.1.0",
     "pytest>=6.0.0",
     "pytest-cov>=2.10.0",
 ]
 docs = [
-    "sphinx>=3.0.0",
-    "sphinx-rtd-theme>=0.5.0",
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.25.0",
+    "mkdocs-git-revision-date-plugin>=0.3.0",
+    "mkdocs-jupyter>=0.24.0",
 ]
 
 [project.urls]
@@ -53,9 +56,36 @@ include = ["intelligen", "intelligen.*"]
 
 # --- Tool Configurations ---
 
-# Configuration for Flake8 (linter)
-[tool.flake8]
-exclude = ["docs"]
+[tool.ruff]
+src = ["intelligen"]
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort (import sorting)
+    "UP", # pyupgrade (modernize code)
+    "B",  # flake8-bugbear (finds likely bugs)
+    "A",  # flake8-builtins (prevents shadowing builtins)
+    "C4", # flake8-comprehensions (encourages efficient comprehensions)
+    "SIM",# flake8-simplify (suggests code simplifications)
+    "S",  # flake8-bandit (security checks)
+    "D",  # pydocstyle (docstring conventions)
+]
+
+ignore = ["D100", "D102", "D103",
+          "E701", "E501"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-first-party = ["intelligen"]
+
+[tool.ruff.format]
+quote-style = "double"
 
 [tool.bump-my-version]
 current_version = "0.13.0"

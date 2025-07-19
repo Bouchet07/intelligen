@@ -1,17 +1,18 @@
-import numpy as np
-import matplotlib.pyplot as plt
-
-from ..ABCDistribution import ABCDiscreteDistribution, Distribution
-from ...special.typings import *
-from ...special import comb
 from functools import cached_property
+from numbers import Integer, Real
+
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy.typing import ArrayLike
+
+from ...special import comb
+from ..ABCDistribution import ABCDiscreteDistribution, Distribution
 
 __all__ = ['Binomial']
 
 class Binomial(ABCDiscreteDistribution):
     """
-    Binomial Distribution
-    =====================
+    Binomial Distribution.
 
     Discrete probability distribution that models the number
     of successes in a sequence of `n` independent experiments
@@ -21,7 +22,7 @@ class Binomial(ABCDiscreteDistribution):
     ----------
     n: int
         Number of Bernoulli trials
-    
+
     p : Real
         Probability of success
 
@@ -31,7 +32,7 @@ class Binomial(ABCDiscreteDistribution):
         `1-p`
 
     mean : Real
-        Expected value / mean 
+        Expected value / mean
 
     variance : Real
         Measure of dispersion
@@ -57,56 +58,57 @@ class Binomial(ABCDiscreteDistribution):
 
     #---------Properties---------#
     @cached_property
-    def mean(self): 
+    def mean(self):
         return self.n * self.p
 
     @cached_property
     def variance(self):
         return self.n * self.p * self.q
-    
+
     @cached_property
-    def skewness(self): 
+    def skewness(self):
         return (self.q - self.p) / np.sqrt(self.variance)
 
     @cached_property
-    def kurtosis(self): 
+    def kurtosis(self):
         return (1 - 6*self.p * self.q) / self.variance
-    
+
 
     def __add__(self, distribution: Distribution) -> Distribution:
         if isinstance(distribution, self.__class__):
             if self.p == distribution.p:
                 return Binomial(2, self.p)
             else: raise ValueError('Probability must be the same')
-        
+
         elif isinstance(distribution, Binomial):
             if self.p == distribution.p:
                 return Binomial(distribution.n + 1, self.p)
             else: raise ValueError('Probability must be the same')
-        
+
         else: raise ValueError('Distributions must be compatible')
-    
+
     def __radd__(self, distribution: Distribution) -> Distribution:
         return self + distribution
-    
-    def __mul__(self, coef: integer) -> Distribution:
-        if isinstance(coef, integer) : return Binomial(coef, self.p)
+
+    def __mul__(self, coef: Integer) -> Distribution:
+        if isinstance(coef, Integer) : return Binomial(coef, self.p)
         else: raise ValueError('The coeficient must be an integer')
-    
-    def __rmul__(self, coef: integer) -> Distribution:
+
+    def __rmul__(self, coef: Integer) -> Distribution:
         return self * coef
-    
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(p={self.p})'
-        
 
-    def pmf(self, k: Union[int,Vector_int]) -> Union[Real,Vector]:
-        if isinstance(k, vector): k = np.asarray(k)
-            
+
+    def pmf(self, k: Integer | ArrayLike) -> Real | ArrayLike:
+        k = np.asarray(k)
+
         return comb(self.n, k) * self.p**k * self.q**(self.n-k)
 
-    def cdf(self, k: Union[Real,Vector]) -> Union[Real,Vector]:
-        if isinstance(k, vector):
+    def cdf(self, k: Real | ArrayLike) -> Real | ArrayLike:
+        k = np.asarray(k)
+        if k.ndim > 0:
             return np.array([self.cdf(i) for i in k])
         else:
             if   k < 0: return 0
@@ -118,16 +120,16 @@ class Binomial(ABCDiscreteDistribution):
 
     def plot_pmf(self, ax=None):
         if ax is None: ax = plt.gca()
-        ax.set_title(f'Probability mass function\nBernoulli')
+        ax.set_title('Probability mass function\nBernoulli')
         bar_plot = ax.bar([0,1],self.pmf([1,0]), width=0.4)
         ax.bar_label(bar_plot,['p','1-p'])
         return ax
-    
+
     def plot_cdf(self, ax=None):
         if ax is None: ax = plt.gca()
-        ax.set_title(f'Cumulative distribution function\nBernoulli')
+        ax.set_title('Cumulative distribution function\nBernoulli')
         ax.step([-1,0,1,2],self.cdf([-1,0,1,2]), where='post')
         return ax
-    
+
     def plot_pdf(self, ax=None) -> plt.axes:
         return super().plot_pdf(ax)
