@@ -3,16 +3,17 @@ from functools import cached_property
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ...special.typings import *
 from ..ABCDistribution import ABCDiscreteDistribution, Distribution
 from .binomial import Binomial
+
+from numbers import Real, Integral
+from numpy.typing import ArrayLike
 
 __all__ = ['Bernoulli']
 
 class Bernoulli(ABCDiscreteDistribution):
     """
-    Bernoulli Distribution
-    ======================
+    Bernoulli Distribution.
 
     Discrete probability distribution of a random variable
     which takes the value 1 with probability`p`and the
@@ -22,14 +23,14 @@ class Bernoulli(ABCDiscreteDistribution):
     ----------
     p : Real
         Probability of success
-    
+
     Attributes
     ----------
     q : Real
         `1-p`
 
     mean : Real
-        Expected value / mean 
+        Expected value / mean
 
     variance : Real
         Measure of dispersion
@@ -96,19 +97,19 @@ class Bernoulli(ABCDiscreteDistribution):
     def __radd__(self, distribution: Distribution) -> Distribution:
         return self + distribution
 
-    def __mul__(self, coef: integer) -> Distribution:
-        if isinstance(coef, integer) : return Binomial(coef, self.p)
+    def __mul__(self, coef: Integral) -> Distribution:
+        if isinstance(coef, Integral) : return Binomial(coef, self.p)
         else: raise ValueError('The coeficient must be an integer')
 
-    def __rmul__(self, coef: integer) -> Distribution:
+    def __rmul__(self, coef: Integral) -> Distribution:
         return self * coef
 
     def __repr__(self) -> str:
         return f'Bernoulli(p={self.p})'
 
 
-    def pmf(self, k: Union[int,Vector_int]) -> Union[Real,Vector]:
-        if isinstance(k, vector):
+    def pmf(self, k: Integral | ArrayLike) -> Real | ArrayLike:
+        if isinstance(k, ArrayLike):
             # return np.array([self.pmf(ki) for ki in k])
             k = np.asarray(k, dtype=float)
 
@@ -122,8 +123,8 @@ class Bernoulli(ABCDiscreteDistribution):
             elif k == 1: return self.p
             else: return Binomial(1, self.p).pmf(k)#raise ValueError('R{0,1}')
 
-    def cdf(self, k: Union[Real,Vector]) -> Union[Real,Vector]:
-        if isinstance(k, vector):
+    def cdf(self, k: Real | ArrayLike) -> Real | ArrayLike:
+        if isinstance(k, ArrayLike):
             # return np.array([self.cdf(ki) for ki in k])
             k = np.asarray(k, dtype=float)
 
@@ -138,24 +139,24 @@ class Bernoulli(ABCDiscreteDistribution):
             elif k < 1: return self.q
             else: return 1
 
-    def pdf(self, a: Union[Real,Vector], b: Union[Real,Vector]) -> Union[Real,Vector,Matrix2D]:
-        if isinstance(a, vector):
-            if isinstance(b, vector):
+    def pdf(self, a: Real | ArrayLike, b: Real | ArrayLike) -> Real | ArrayLike:
+        if isinstance(a, ArrayLike):
+            if isinstance(b, ArrayLike):
                 return np.tile(self.cdf(b).reshape(-1,1), len(a)) - self.cdf(a)
 
         return self.cdf(b) - self.cdf(a)
 
-    def mgf(self, t: Union[Real,Vector]) -> Union[Real,Vector]:
+    def mgf(self, t: Real | ArrayLike) -> Real | ArrayLike:
         return self.q + self.p*np.exp(t)
 
-    def cf(self, t: Union[Real,Vector]) -> Union[Real,Vector]:
+    def cf(self, t: Real | ArrayLike) -> Real | ArrayLike:
         return self.q + self.p*np.exp(1j*t)
 
-    def rmoment(self, order: Union[int, Vector_int]) -> Union[Real,Vector]:
-        if isinstance(order, vector): return np.full_like(order, self.p, dtype=float)
+    def rmoment(self, order: Integral | ArrayLike) -> Real | ArrayLike:
+        if isinstance(order, ArrayLike): return np.full_like(order, self.p, dtype=float)
         return self.p
 
-    def cmoment(self, order: Union[int, Vector_int]) -> Union[Real,Vector]:
+    def cmoment(self, order: Integral | ArrayLike) -> Real | ArrayLike:
         return self.q*np.power(-self.p, order) + self.p*np.power(self.q, order)
 
     #-----------Plots-----------#

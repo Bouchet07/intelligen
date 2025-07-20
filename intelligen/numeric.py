@@ -1,10 +1,9 @@
 import numpy as np
 
 from intelligen.special import comb as combination
-from intelligen.special.typings import *
 
 
-def derivative(f: Function ,a: float, order: int=1, method: str='central', h: float=0.01):
+def derivative(f ,a: float, order: int=1, method: str='central', h: float=0.01):
     """
     Derivative
     ========
@@ -54,7 +53,7 @@ def derivative(f: Function ,a: float, order: int=1, method: str='central', h: fl
 #---------------Find Root---------------#
 
 
-def newton(f: Function, x: float, tol: float, iter: bool = False) -> float:
+def newton(f, x: float, tol: float, iter: bool = False) -> float:
     """
     Newton
     ======
@@ -96,7 +95,7 @@ def newton(f: Function, x: float, tol: float, iter: bool = False) -> float:
         return x, n
     return x
 
-def bisection(f: Function, xi: float, xf: float, tol: float, iter: bool = False) -> float:
+def bisection(f, xi: float, xf: float, tol: float, iter: bool = False) -> float:
     """
     Bisection
     =========
@@ -151,7 +150,7 @@ def bisection(f: Function, xi: float, xf: float, tol: float, iter: bool = False)
     else:
         print("Invalid input")
 
-def regula_falsi(f: Function, xi: float, xf: float, tol: float, iter: bool = False) -> float:
+def regula_falsi(f, xi: float, xf: float, tol: float, iter: bool = False) -> float:
     """
     Regula Falsi
     ============
@@ -207,7 +206,7 @@ def regula_falsi(f: Function, xi: float, xf: float, tol: float, iter: bool = Fal
         print("Invalid input")
 
 
-def secant(f: Function, x0: float, x1: float, tol: float, iter: bool = False) -> float:
+def secant(f, x0: float, x1: float, tol: float, iter: bool = False) -> float:
     """
     Secant
     ======
@@ -272,7 +271,7 @@ def secant(f: Function, x0: float, x1: float, tol: float, iter: bool = False) ->
     print("Doesn't converge")  """
 
 
-def newton2(f: Function, x: float, tol: float, iter: bool = False) -> float:
+def newton2(f, x: float, tol: float, iter: bool = False) -> float:
     """
     Newton 2nd order
     ================

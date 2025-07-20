@@ -42,7 +42,7 @@ class LinearRegression(LinearModel):
         Number of features seen during :term:`fit`.
     """
 
-    def __init__(self, positive = False, implementation = 'numpy') -> None:
+    def __init__(self, positive: bool = False, implementation: str = 'numpy') -> None:
         self.positive = positive
         self.implementation = implementation
 
@@ -59,7 +59,7 @@ class LinearRegression(LinearModel):
         """
         # This only ensures X is 2D, y can be 1D
         self.n_features_in_ = X.shape[1] if X.ndim > 1 else 1
-        X, y = self.X, self.y
+        self.X, self.y = X, y
 
         if self.positive:
             # We add the coefficient column

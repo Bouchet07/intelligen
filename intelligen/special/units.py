@@ -1,14 +1,14 @@
-# from typing import Union, List
-# from numbers import Real
-# Vector = List[Real]
+
+from numbers import Real
+from numpy.typing import ArrayLike
+
 from ..constants import *
-from .typings import *
 
 
-def convert(x: Union[Real, Vector], ini_units: str, fin_units: str) -> Union[Real, Vector]:
+
+def convert(x: Real | ArrayLike, ini_units: str, fin_units: str) -> Real | ArrayLike:
     """
-    Unit conversor
-    ==============
+    Unit conversor.
 
     Parameters
     ----------
@@ -75,7 +75,7 @@ def convert(x: Union[Real, Vector], ini_units: str, fin_units: str) -> Union[Rea
         
         for more [information](https://en.wikipedia.org/wiki/Unit_of_length)
 
-    -------    
+    -------
     - Mass:
 
         SI

@@ -142,5 +142,5 @@ class LinearModel:
             ax.scatter(X[:, 0], X[:, 1], y, c = 'lightcoral', label='Data')
             # ax.legend()
         else:
-            raise ValueError(f'plot doesn\'t support {self.num_features} number of features')
+            raise ValueError(f'plot doesn\'t support {self.n_features_in_} number of features')
         return ax

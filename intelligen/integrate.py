@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .special.typings import *
 
 
-def newton_cotes(y: Vector=None, x: Vector=None, formula: str='trapz', h: float=1,
-                 f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
+def newton_cotes(y=None, x=None, formula: str='trapz', h: float=1,
+                 f=None, a: float=None, b: float=None, N: int=100) -> float:
     """
     Newton-Cotes rules
     ==================
@@ -98,8 +97,8 @@ def newton_cotes(y: Vector=None, x: Vector=None, formula: str='trapz', h: float=
         s += eval(fs)
     return s
 
-def trapz(y: Vector=None, x: Vector=None, h: float=1,
-          f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
+def trapz(y=None, x=None, h: float=1,
+          f=None, a: float=None, b: float=None, N: int=100) -> float:
     """
     Trapezoidal Rule
     ================
@@ -147,8 +146,8 @@ def trapz(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'trapz', h, f, a, b, N)
 
-def simpson(y: Vector=None, x: Vector=None, h: float=1,
-            f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
+def simpson(y=None, x=None, h: float=1,
+            f=None, a: float=None, b: float=None, N: int=100) -> float:
     """
     Simpson's Rule
     ============
@@ -195,8 +194,8 @@ def simpson(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'simpson', h, f, a, b, N)
 
-def simpson3_8(y: Vector=None, x: Vector=None, h: float=1,
-               f: Function=None, a: float=None, b: float=None, N: int=99) -> float:
+def simpson3_8(y=None, x=None, h: float=1,
+               f=None, a: float=None, b: float=None, N: int=99) -> float:
     """
     Simpson's Rule 3/8
     ================
@@ -243,8 +242,8 @@ def simpson3_8(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'simpson3_8', h, f, a, b, N)
 
-def boole(y: Vector=None, x: Vector=None, h: float=1,
-          f: Function=None, a: float=None, b: float=None, N: int=100) -> float:
+def boole(y=None, x=None, h: float=1,
+          f=None, a: float=None, b: float=None, N: int=100) -> float:
     """
     Boole's Rule 
     ============
@@ -279,8 +278,8 @@ def boole(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'boole', h, f, a, b, N)
 
-def weddle(y: Vector=None, x: Vector=None, h: float=1,
-           f: Function=None, a: float=None, b: float=None, N: int=96) -> float:
+def weddle(y=None, x=None, h: float=1,
+           f=None, a: float=None, b: float=None, N: int=96) -> float:
     """
     Weddle's Rule 
     ==========
@@ -313,8 +312,8 @@ def weddle(y: Vector=None, x: Vector=None, h: float=1,
     """
     return newton_cotes(y, x, 'weddle', h, f, a, b, N)
 
-def newton_cotes2(y: Vector=None, x: Vector=None, h: float=1,
-                 f: Function=None, a: float=None, b: float=None, n: int=100) -> float:
+def newton_cotes2(y=None, x=None, h: float=1,
+                 f=None, a: float=None, b: float=None, n: int=100) -> float:
     n = len(y)-1
     if   n == 1: return trapz(y,x,h)
     elif n == 2: return simpson(y,x,h)
@@ -323,7 +322,7 @@ def newton_cotes2(y: Vector=None, x: Vector=None, h: float=1,
     elif n == 6: return weddle(y,x,h)
 
 
-def odeEuler(f: Function2d, t0: float, tfin: float, N: int, y0: Union[float, Vector]) -> Tuple[Vector, Vector]:
+def odeEuler(f, t0: float, tfin: float, N: int, y0):
     """
     Euler Method
     ============
@@ -383,7 +382,7 @@ def odeEuler(f: Function2d, t0: float, tfin: float, N: int, y0: Union[float, Vec
 
     return T, U
 
-def slope_field(f: Function2d, range: list = None,
+def slope_field(f, range: list = None,
                 xlim: list = None, ylim: list = None,
                 normalize: bool = True, plot_type: str = 'quiver',
                 density: int = 20, color: bool = True,

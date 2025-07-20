@@ -1,5 +1,5 @@
 from functools import cached_property
-from numbers import Integer, Real
+from numbers import Integral, Real
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -90,18 +90,18 @@ class Binomial(ABCDiscreteDistribution):
     def __radd__(self, distribution: Distribution) -> Distribution:
         return self + distribution
 
-    def __mul__(self, coef: Integer) -> Distribution:
-        if isinstance(coef, Integer) : return Binomial(coef, self.p)
+    def __mul__(self, coef: Integral) -> Distribution:
+        if isinstance(coef, Integral) : return Binomial(coef, self.p)
         else: raise ValueError('The coeficient must be an integer')
 
-    def __rmul__(self, coef: Integer) -> Distribution:
+    def __rmul__(self, coef: Integral) -> Distribution:
         return self * coef
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(p={self.p})'
 
 
-    def pmf(self, k: Integer | ArrayLike) -> Real | ArrayLike:
+    def pmf(self, k: Integral | ArrayLike) -> Real | ArrayLike:
         k = np.asarray(k)
 
         return comb(self.n, k) * self.p**k * self.q**(self.n-k)

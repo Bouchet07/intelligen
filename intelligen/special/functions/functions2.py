@@ -3,12 +3,11 @@ from scipy.special import comb, erf, erfc, erfi, erfinv, factorial
 
 #from constants import golden, igolden
 from ...constants import *
-from ..typings import *
 
 __all__ = ['erf', 'erfc', 'erfi', 'erfinv', 'factorial', 'comb',
            'fibonacci', 'binet']
 
-def fibonacci(n: int, list: bool = False, start_points: Vector_int = None) -> int:
+def fibonacci(n: int, list: bool = False, start_points = None) -> int:
     """
     Fibonacci Numbers
     =================

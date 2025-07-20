@@ -1,5 +1,5 @@
 import abc
-from typing import Real
+from numbers import Real
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -162,12 +162,12 @@ class ABCDiscreteDistribution(ABCDistribution):
 
         Parameters
         ----------
-        t : Union[Real,Vector]
+        t : Real | ArrayLike
             _description_
 
         Returns
         -------
-        Union[Real,Vector]
+        Real | ArrayLike
             _description_
         """
         pass
@@ -179,12 +179,12 @@ class ABCDiscreteDistribution(ABCDistribution):
 
         Parameters
         ----------
-        t : Union[Real,Vector]
+        t : Real | ArrayLike
             _description_
 
         Returns
         -------
-        Union[Real,Vector]
+        Real | ArrayLike
             _description_
         """
         pass
