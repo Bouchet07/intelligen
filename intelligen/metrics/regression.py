@@ -1,6 +1,6 @@
 import numpy as np
 
-__all__ = ['mean_squared_error', 'r2_score']
+__all__ = ['mean_squared_error', 'mean_absolute_error', 'r2_score']
 
 def mean_squared_error(y_true, y_pred):
     """
@@ -16,6 +16,21 @@ def mean_squared_error(y_true, y_pred):
     float: The Mean Squared Error.
     """
     return np.mean((y_true - y_pred) ** 2)
+
+def mean_absolute_error(y_true, y_pred):
+    """
+    Calculate the Mean Absolute Error (MAE) between true and predicted values.
+
+    Parameters
+    ----------
+    y_true (array-like): True target values.
+    y_pred (array-like): Predicted target values.
+
+    Returns
+    -------
+    float: The Mean Absolute Error.
+    """
+    return np.mean(np.abs(y_true - y_pred))
 
 def r2_score(y_true, y_pred):
     """
