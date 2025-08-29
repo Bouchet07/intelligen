@@ -107,3 +107,6 @@ ENV/
 # Test ipynb
 Test.ipynb
 uv.lock
+
+# Meson build directories
+.mesonpy-*/
