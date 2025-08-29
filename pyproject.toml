@@ -1,6 +1,6 @@
 [build-system]
-requires = ["meson-python", "numpy"]
-build-backend = "mesonpy"
+requires = ["setuptools>=61.0", "numpy"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "intelligen"
@@ -31,8 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 build = [
-    "meson",
-    "ninja",
+    "numpy",
 ]
 dev = [
     "ruff>=0.5.0",

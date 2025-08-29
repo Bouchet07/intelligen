@@ -1,70 +1,111 @@
-// src/_faddeeva_wrapper.cpp
-
 #define PY_SSIZE_T_CLEAN
-#include <Python.h>           // Python C API
-#include <complex>            // For std::complex
+#include <Python.h>             // Python C API
+#include <complex>              // For std::complex
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "numpy/arrayobject.h" // NumPy C API
-#include "Faddeeva.hh"         // Your Faddeeva header
+#include "Faddeeva.hh"
 
-// 1. Wrapper for a REAL function: Faddeeva::erf(double)
-static PyObject* py_erf(PyObject* self, PyObject* args) {
-    PyArrayObject* in_array;
-
-    // Parse the input from Python: "O!" checks if the object is a PyArray_Type
-    if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &in_array)) {
-        return NULL; // Error
-    }
-
-    // Ensure the input array is of type double (NPY_DOUBLE) and is C-style contiguous
-    in_array = (PyArrayObject*)PyArray_ContiguousFromObject((PyObject*)in_array, NPY_DOUBLE, 1, 1);
-    if (in_array == NULL) {
-        PyErr_SetString(PyExc_TypeError, "Input must be a 1D numpy array of floats.");
-        return NULL;
-    }
-
-    // Create the output NumPy array with the same shape as the input
-    PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew(
-        PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_DOUBLE
-    );
-    if (out_array == NULL) {
-        Py_DECREF(in_array);
-        return NULL;
-    }
-
-    // Get pointers to the data buffers
-    double* in_ptr = (double*)PyArray_DATA(in_array);
-    double* out_ptr = (double*)PyArray_DATA(out_array);
-    npy_intp n = PyArray_SIZE(in_array);
-
-    // The core loop: call the C++ function for each element
-    for (npy_intp i = 0; i < n; ++i) {
-        out_ptr[i] = Faddeeva::erf(in_ptr[i]);
-    }
-
-    Py_DECREF(in_array); // Clean up the input array reference
-    return (PyObject*)out_array; // Return the new output array
+// =============================================================================
+// Helper macro to define a Python function that dispatches to real/complex
+// C++ backends based on the input array's dtype.
+// =============================================================================
+// EDITED: Removed the unused 'docstring' parameter to avoid confusion.
+#define FADDEEVA_DISPATCH_WRAPPER(py_name, c_name) \
+static PyObject* py_name(PyObject* self, PyObject* args) { \
+    PyObject* input_obj = NULL; \
+    double relerr = 0.0; \
+    if (!PyArg_ParseTuple(args, "O|d", &input_obj, &relerr)) { \
+        return NULL; \
+    } \
+\
+    PyArray_Descr* descr = PyArray_DescrFromObject(input_obj, NULL); \
+    if (descr == NULL) { \
+        return NULL; \
+    } \
+\
+    PyObject* result = NULL; \
+    if (PyDataType_ISCOMPLEX(descr)) { \
+        PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
+            input_obj, NPY_COMPLEX128, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
+        ); \
+        if (in_array == NULL) { \
+            Py_DECREF(descr); \
+            return NULL; \
+        } \
+        PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew( \
+            PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_COMPLEX128 \
+        ); \
+        if (out_array == NULL) { \
+            Py_DECREF(in_array); \
+            Py_DECREF(descr); \
+            return NULL; \
+        } \
+        std::complex<double>* in_ptr = (std::complex<double>*)PyArray_DATA(in_array); \
+        std::complex<double>* out_ptr = (std::complex<double>*)PyArray_DATA(out_array); \
+        npy_intp n = PyArray_SIZE(in_array); \
+        for (npy_intp i = 0; i < n; ++i) { \
+            out_ptr[i] = Faddeeva::c_name(in_ptr[i], relerr); \
+        } \
+        Py_DECREF(in_array); \
+        result = (PyObject*)out_array; \
+    } else { \
+        PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
+            input_obj, NPY_DOUBLE, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
+        ); \
+        if (in_array == NULL) { \
+            Py_DECREF(descr); \
+            return NULL; \
+        } \
+        PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew( \
+            PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_DOUBLE \
+        ); \
+        if (out_array == NULL) { \
+            Py_DECREF(in_array); \
+            Py_DECREF(descr); \
+            return NULL; \
+        } \
+        double* in_ptr = (double*)PyArray_DATA(in_array); \
+        double* out_ptr = (double*)PyArray_DATA(out_array); \
+        npy_intp n = PyArray_SIZE(in_array); \
+        for (npy_intp i = 0; i < n; ++i) { \
+            out_ptr[i] = Faddeeva::c_name(in_ptr[i]); \
+        } \
+        Py_DECREF(in_array); \
+        result = (PyObject*)out_array; \
+    } \
+\
+    Py_DECREF(descr); \
+    return result; \
 }
 
+// =============================================================================
+// Implement the wrappers for all dispatchable functions using the macro
+// =============================================================================
+// EDITED: Removed the third 'docstring' argument from macro calls.
+FADDEEVA_DISPATCH_WRAPPER(py_erf, erf)
+FADDEEVA_DISPATCH_WRAPPER(py_erfc, erfc)
+FADDEEVA_DISPATCH_WRAPPER(py_erfi, erfi)
+FADDEEVA_DISPATCH_WRAPPER(py_erfcx, erfcx)
+FADDEEVA_DISPATCH_WRAPPER(py_Dawson, Dawson)
 
-// 2. Wrapper for a COMPLEX function: Faddeeva::w(complex)
+
+// =============================================================================
+// Wrapper for Faddeeva::w (always complex)
+// =============================================================================
 static PyObject* py_w(PyObject* self, PyObject* args) {
-    PyArrayObject* in_array;
-    double relerr = 0.0; // Default relative error
-
-    // "O!|d": Array object OR double for optional relerr
-    if (!PyArg_ParseTuple(args, "O!|d", &PyArray_Type, &in_array, &relerr)) {
+    PyObject* input_obj = NULL;
+    double relerr = 0.0;
+    if (!PyArg_ParseTuple(args, "O|d", &input_obj, &relerr)) {
         return NULL;
     }
     
-    // Ensure input is complex128 and contiguous
-    in_array = (PyArrayObject*)PyArray_ContiguousFromObject((PyObject*)in_array, NPY_COMPLEX128, 1, 1);
+    PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
+        input_obj, NPY_COMPLEX128, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
+    );
     if (in_array == NULL) {
-        PyErr_SetString(PyExc_TypeError, "Input must be a 1D numpy array of complex numbers.");
         return NULL;
     }
 
-    // Create output array
     PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew(
         PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_COMPLEX128
     );
@@ -73,12 +114,10 @@ static PyObject* py_w(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    // Get data pointers
     std::complex<double>* in_ptr = (std::complex<double>*)PyArray_DATA(in_array);
     std::complex<double>* out_ptr = (std::complex<double>*)PyArray_DATA(out_array);
     npy_intp n = PyArray_SIZE(in_array);
 
-    // The core loop
     for (npy_intp i = 0; i < n; ++i) {
         out_ptr[i] = Faddeeva::w(in_ptr[i], relerr);
     }
@@ -87,30 +126,72 @@ static PyObject* py_w(PyObject* self, PyObject* args) {
     return (PyObject*)out_array;
 }
 
+// =============================================================================
+// Wrapper for Faddeeva::w_im (real input, real output)
+// =============================================================================
+static PyObject* py_w_im(PyObject* self, PyObject* args) {
+    PyObject* input_obj = NULL;
+    if (!PyArg_ParseTuple(args, "O", &input_obj)) {
+        return NULL;
+    }
+    
+    PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
+        input_obj, NPY_DOUBLE, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
+    );
+    if (in_array == NULL) {
+        return NULL;
+    }
 
-// 3. Method definition table: maps Python function names to C++ functions
+    PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew(
+        PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_DOUBLE
+    );
+    if (out_array == NULL) {
+        Py_DECREF(in_array);
+        return NULL;
+    }
+
+    double* in_ptr = (double*)PyArray_DATA(in_array);
+    double* out_ptr = (double*)PyArray_DATA(out_array);
+    npy_intp n = PyArray_SIZE(in_array);
+
+    for (npy_intp i = 0; i < n; ++i) {
+        out_ptr[i] = Faddeeva::w_im(in_ptr[i]);
+    }
+
+    Py_DECREF(in_array);
+    return (PyObject*)out_array;
+}
+
+
+// =============================================================================
+// Method and Module Definitions
+// =============================================================================
+
+// EDITED: Replaced undeclared variables with the correct string literals.
 static PyMethodDef FaddeevaMethods[] = {
-    {"erf", py_erf, METH_VARARGS, "Calculate the error function for a NumPy array of real numbers."},
-    {"w", py_w, METH_VARARGS, "Calculate the Faddeeva function for a NumPy array of complex numbers."},
+    {"w", py_w, METH_VARARGS, "Calculate the Faddeeva function, w(z)."},
+    {"w_im", py_w_im, METH_VARARGS, "Calculate Im[w(x)] for real x."},
+    {"erf", py_erf, METH_VARARGS, "Calculate the error function, erf(z)."},
+    {"erfc", py_erfc, METH_VARARGS, "Calculate the complementary error function, erfc(z)."},
+    {"erfi", py_erfi, METH_VARARGS, "Calculate the imaginary error function, erfi(z)."},
+    {"erfcx", py_erfcx, METH_VARARGS, "Calculate the scaled complementary error function, erfcx(z)."},
+    {"Dawson", py_Dawson, METH_VARARGS, "Calculate the Dawson function, Dawson(z)."},
     {NULL, NULL, 0, NULL} // Sentinel
 };
 
-// 4. Module definition structure
 static struct PyModuleDef faddeeva_module = {
     PyModuleDef_HEAD_INIT,
-    "_faddeeva", // Module name
-    "A C++ extension for Faddeeva functions.", // Module docstring
+    "_faddeeva",
+    "A C++ extension for the complete Faddeeva function package.",
     -1,
     FaddeevaMethods
 };
 
-// 5. Module initialization function
 PyMODINIT_FUNC PyInit__faddeeva(void) {
     PyObject* m = PyModule_Create(&faddeeva_module);
     if (m == NULL) {
         return NULL;
     }
-    // IMPORTANT: This macro MUST be called to initialize the NumPy C API
     import_array();
     return m;
 }
