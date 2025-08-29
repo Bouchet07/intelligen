@@ -1,41 +1,51 @@
+name: Build and Publish Wheels
+
 on:
-    push:
-        branches:
-            - master
-    pull_request:
-        branches:
-            - master
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  release:
+    types: [created]
 
-name: build
 jobs:
-    py-check:
-        runs-on: ${{ matrix.config.os }}
-        name: ${{ matrix.config.os }} (${{ matrix.config.py }})
-        strategy:
-            fail-fast: false
-            matrix:
-                config:
-                    - { os: windows-latest, py: "3.7" }
-                    - { os: macOS-latest, py: "3.7" }
-                    - { os: ubuntu-latest, py: "3.6" }
-                    - { os: ubuntu-latest, py: "3.7" }
-                    - { os: ubuntu-latest, py: "3.8" }
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for ARM builds on Linux)
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.1
         env:
-            SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
-        steps:
-            - name: CHECKOUT CODE
-              uses: actions/checkout@v2
-            - name: SETUP PYTHON
-              uses: actions/setup-python@v1
-              with:
-                  python-version: ${{ matrix.config.py }}
-            - name: Install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install --user --no-cache-dir Cython
-                  pip install --user -r requirements.txt
-                  pip install --user -r requirements_dev.txt
-            - name: PKG-TEST
-              run: |
-                  python -m unittest discover tests/
+          # Tell cibuildwheel to build for Python 3.10, 3.11, 3.12, and 3.13
+          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          # Install test dependencies from pyproject.toml's 'dev' extra
+          CIBW_TEST_REQUIRES: ".[dev]"
+          # Run tests using pytest, which is installed from the 'dev' extra
+          CIBW_TEST_COMMAND: "pytest tests/"
+
+      - name: Upload built wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+      - name: Publish to PyPI
+        # Only run this step when a new release is created on GitHub
+        if: github.event_name == 'release' && github.event.action == 'created'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # This uses a token created via PyPI's Trusted Publishing feature.
+          # You must configure this on PyPI for your project.
+          password: ${{ secrets.GHA_PYPI_API_TOKEN }}
