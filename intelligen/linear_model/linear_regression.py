@@ -42,9 +42,17 @@ class LinearRegression(LinearModel):
         Number of features seen during :term:`fit`.
     """
 
-    def __init__(self, positive: bool = False, implementation: str = 'numpy') -> None:
+    def __init__(self, positive: bool = False,
+                 implementation: str = 'numpy',
+                 fit_intercept: bool = True) -> None:
+
         self.positive = positive
         self.implementation = implementation
+        self.fit_intercept = fit_intercept
+        self._fitted = False
+        self.n_features_in_ = None
+        self.coef_ = None
+        self.intercept_ = None
 
     def fit(self, X, y) -> None:
         """
@@ -57,8 +65,11 @@ class LinearRegression(LinearModel):
         y : Array-like, shape(n_samples,) or (n_samples, n_targets)
             Target
         """
+        X = np.atleast_1d(X)
+        if X.ndim == 1: X = X.reshape(-1, 1)
+        y = np.atleast_1d(y)
         # This only ensures X is 2D, y can be 1D
-        self.n_features_in_ = X.shape[1] if X.ndim > 1 else 1
+        self.n_features_in_ = X.shape[1]
         self.X, self.y = X, y
 
         if self.positive:

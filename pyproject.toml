@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "intelligen"
-version = "0.13.0" # This version is now managed by bump-my-version
+version = "0.13.1"
 authors = [
     { name = "Diego Bouchet", email = "diegobouchet88@gmail.com" }
 ]
@@ -29,11 +29,9 @@ dependencies = [
     "matplotlib"
 ]
 
-
 [project.optional-dependencies]
 dev = [
     "ruff>=0.5.0",
-    "bump-my-version>=0.1.0",
     "pytest>=6.0.0",
     "pytest-cov>=2.10.0",
 ]
@@ -86,13 +84,3 @@ known-first-party = ["intelligen"]
 
 [tool.ruff.format]
 quote-style = "double"
-
-[tool.bump-my-version]
-current_version = "0.13.0"
-commit = true
-tag = true
-
-[[tool.bump-my-version.files]]
-filename = "pyproject.toml"
-search = 'current_version = "{current_version}"'
-replace = 'current_version = "{new_version}"'
