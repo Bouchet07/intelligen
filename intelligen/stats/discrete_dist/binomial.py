@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import ArrayLike
 
-from ...special import comb
+from scipy.special import comb
 from ..ABCDistribution import ABCDiscreteDistribution, Distribution
 
 __all__ = ['Binomial']

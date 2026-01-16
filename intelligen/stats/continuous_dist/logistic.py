@@ -45,7 +45,7 @@ class Logistic(ABCContinousDistribution):
     def entropy(self):
         """
         Average level of "information", "surprise", or "uncertainty"
-        inherent to the variable's possible outcomes
+        inherent to the variable's possible outcomes.
         """
         return np.log(self.s) + 2
 

@@ -1,10 +1,10 @@
 import numpy as np
-from scipy.special import comb, erf, erfc, erfi, erfinv, factorial
+from scipy.special import comb, factorial
 
 #from constants import golden, igolden
 from ...constants import *
 
-__all__ = ['erf', 'erfc', 'erfi', 'erfinv', 'factorial', 'comb',
+__all__ = ['factorial', 'comb',
            'fibonacci', 'binet']
 
 def fibonacci(n: int, list: bool = False, start_points = None) -> int:

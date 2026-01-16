@@ -30,6 +30,12 @@ jobs:
         env:
           # Tell cibuildwheel to build for Python 3.10, 3.11, 3.12, and 3.13
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          # EDITED: Ensure a modern NumPy is installed before building the C++ extension.
+          # This fixes the PyArray_FROM_OTF macro error on Linux.
+          CIBW_BEFORE_BUILD: "pip install numpy"
+          # EDITED: Skip 32-bit Windows builds. This avoids the difficult process
+          # of building SciPy from source during the testing phase.
+          CIBW_SKIP: "*-win32"
           # Install test dependencies from pyproject.toml's 'dev' extra
           CIBW_TEST_REQUIRES: ".[dev]"
           # Run tests using pytest, which is installed from the 'dev' extra
