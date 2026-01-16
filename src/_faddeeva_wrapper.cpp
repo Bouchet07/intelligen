@@ -9,7 +9,6 @@
 // Helper macro to define a Python function that dispatches to real/complex
 // C++ backends based on the input array's dtype.
 // =============================================================================
-// EDITED: Removed the unused 'docstring' parameter to avoid confusion.
 #define FADDEEVA_DISPATCH_WRAPPER(py_name, c_name) \
 static PyObject* py_name(PyObject* self, PyObject* args) { \
     PyObject* input_obj = NULL; \
@@ -25,8 +24,9 @@ static PyObject* py_name(PyObject* self, PyObject* args) { \
 \
     PyObject* result = NULL; \
     if (PyDataType_ISCOMPLEX(descr)) { \
+        /* FIXED: Removed '0, 0,' arguments */ \
         PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
-            input_obj, NPY_COMPLEX128, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
+            input_obj, NPY_COMPLEX128, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
         ); \
         if (in_array == NULL) { \
             Py_DECREF(descr); \
@@ -49,8 +49,9 @@ static PyObject* py_name(PyObject* self, PyObject* args) { \
         Py_DECREF(in_array); \
         result = (PyObject*)out_array; \
     } else { \
+        /* FIXED: Removed '0, 0,' arguments */ \
         PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
-            input_obj, NPY_DOUBLE, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
+            input_obj, NPY_DOUBLE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
         ); \
         if (in_array == NULL) { \
             Py_DECREF(descr); \
@@ -81,7 +82,6 @@ static PyObject* py_name(PyObject* self, PyObject* args) { \
 // =============================================================================
 // Implement the wrappers for all dispatchable functions using the macro
 // =============================================================================
-// EDITED: Removed the third 'docstring' argument from macro calls.
 FADDEEVA_DISPATCH_WRAPPER(py_erf, erf)
 FADDEEVA_DISPATCH_WRAPPER(py_erfc, erfc)
 FADDEEVA_DISPATCH_WRAPPER(py_erfi, erfi)
@@ -99,8 +99,9 @@ static PyObject* py_w(PyObject* self, PyObject* args) {
         return NULL;
     }
     
+    /* FIXED: Removed '0, 0,' arguments */
     PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
-        input_obj, NPY_COMPLEX128, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
+        input_obj, NPY_COMPLEX128, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
     );
     if (in_array == NULL) {
         return NULL;
@@ -135,8 +136,9 @@ static PyObject* py_w_im(PyObject* self, PyObject* args) {
         return NULL;
     }
     
+    /* FIXED: Removed '0, 0,' arguments */
     PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
-        input_obj, NPY_DOUBLE, 0, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
+        input_obj, NPY_DOUBLE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
     );
     if (in_array == NULL) {
         return NULL;
@@ -167,7 +169,6 @@ static PyObject* py_w_im(PyObject* self, PyObject* args) {
 // Method and Module Definitions
 // =============================================================================
 
-// EDITED: Replaced undeclared variables with the correct string literals.
 static PyMethodDef FaddeevaMethods[] = {
     {"w", py_w, METH_VARARGS, "Calculate the Faddeeva function, w(z)."},
     {"w_im", py_w_im, METH_VARARGS, "Calculate Im[w(x)] for real x."},
@@ -181,13 +182,13 @@ static PyMethodDef FaddeevaMethods[] = {
 
 static struct PyModuleDef faddeeva_module = {
     PyModuleDef_HEAD_INIT,
-    "_faddeeva",
+    "intelligen.special._faddeeva", // IMPORTANT: Matches the full package path
     "A C++ extension for the complete Faddeeva function package.",
     -1,
     FaddeevaMethods
 };
 
-PyMODINIT_FUNC PyInit__faddeeva(void) {
+extern "C" PyMODINIT_FUNC PyInit__faddeeva(void) {
     PyObject* m = PyModule_Create(&faddeeva_module);
     if (m == NULL) {
         return NULL;
