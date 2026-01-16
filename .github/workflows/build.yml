@@ -1,10 +1,10 @@
-name: Build and Publish Wheels
+name: Build and Publish
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: ["master", "main"]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: ["master", "main"]
   release:
     types: [created]
 
@@ -21,25 +21,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up QEMU (for ARM builds on Linux)
+      # Only needed if you want to support ARM builds (optional)
+      - name: Set up QEMU
         if: runner.os == 'Linux'
         uses: docker/setup-qemu-action@v3
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
+        uses: pypa/cibuildwheel@v2.21.3
         env:
-          # Tell cibuildwheel to build for Python 3.10, 3.11, 3.12, and 3.13
+          # Build for Python 3.10 - 3.13
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
-          # EDITED: Ensure a modern NumPy is installed before building the C++ extension.
-          # This fixes the PyArray_FROM_OTF macro error on Linux.
-          CIBW_BEFORE_BUILD: "pip install numpy"
-          # EDITED: Skip 32-bit Windows builds. This avoids the difficult process
-          # of building SciPy from source during the testing phase.
-          CIBW_SKIP: "*-win32"
-          # Install test dependencies from pyproject.toml's 'dev' extra
+          
+          # Skip 32-bit Windows (hard to build scipy/numpy ecosystem there)
+          CIBW_SKIP: "*-win32 pp*" 
+          
+          # Install test dependencies (pytest is in your dev extras)
           CIBW_TEST_REQUIRES: ".[dev]"
-          # Run tests using pytest, which is installed from the 'dev' extra
-          CIBW_TEST_COMMAND: "pytest tests/"
+          
+          # CRITICAL FIX: --import-mode=importlib
+          # This prevents pytest from picking up the local 'intelligen' folder 
+          # (which is uncompiled) and forces it to use the installed wheel.
+          CIBW_TEST_COMMAND: "pytest {project}/tests --import-mode=importlib"
 
       - name: Upload built wheels
         uses: actions/upload-artifact@v4
@@ -47,11 +49,41 @@ jobs:
           name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
+  # NEW: Build the Source Distribution (.tar.gz)
+  make_sdist:
+    name: Make Source Distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pip-sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, make_sdist] # Wait for both wheels and sdist
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'created'
+    
+    steps:
+      # Download artifacts from all previous jobs
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: pip-sdist
+          path: dist
+
       - name: Publish to PyPI
-        # Only run this step when a new release is created on GitHub
-        if: github.event_name == 'release' && github.event.action == 'created'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          # This uses a token created via PyPI's Trusted Publishing feature.
-          # You must configure this on PyPI for your project.
           password: ${{ secrets.GHA_PYPI_API_TOKEN }}
