@@ -2,6 +2,11 @@ class Config:
     def __init__(self):
         self._supported_backends = ["matplotlib", "plotly"]
         self._plot_backend = "matplotlib"
+        self._eps = 1e-10
+
+    @property
+    def supported_backends(self):
+        return self._supported_backends
 
     @property
     def plot_backend(self):
@@ -15,6 +20,16 @@ class Config:
                 f"Supported backends are: {self._supported_backends}"
             )
         self._plot_backend = value
+
+    @property
+    def eps(self):
+        return self._eps
+
+    @eps.setter
+    def eps(self, value):
+        if value <= 0:
+            raise ValueError("Epsilon must be a positive number.")
+        self._eps = value
 
     def __repr__(self):
         display_attrs = {
