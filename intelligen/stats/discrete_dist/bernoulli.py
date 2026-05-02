@@ -109,7 +109,7 @@ class Bernoulli(ABCDiscreteDistribution):
 
 
     def pmf(self, k: Integral | ArrayLike) -> Real | ArrayLike:
-        if isinstance(k, ArrayLike):
+        if isinstance(k, (list, tuple, np.ndarray)):
             # return np.array([self.pmf(ki) for ki in k])
             k = np.asarray(k, dtype=float)
 
@@ -124,7 +124,7 @@ class Bernoulli(ABCDiscreteDistribution):
             else: return Binomial(1, self.p).pmf(k)#raise ValueError('R{0,1}')
 
     def cdf(self, k: Real | ArrayLike) -> Real | ArrayLike:
-        if isinstance(k, ArrayLike):
+        if isinstance(k, (list, tuple, np.ndarray)):
             # return np.array([self.cdf(ki) for ki in k])
             k = np.asarray(k, dtype=float)
 
@@ -140,8 +140,8 @@ class Bernoulli(ABCDiscreteDistribution):
             else: return 1
 
     def pdf(self, a: Real | ArrayLike, b: Real | ArrayLike) -> Real | ArrayLike:
-        if isinstance(a, ArrayLike):
-            if isinstance(b, ArrayLike):
+        if isinstance(a, (list, tuple, np.ndarray)):
+            if isinstance(b, (list, tuple, np.ndarray)):
                 return np.tile(self.cdf(b).reshape(-1,1), len(a)) - self.cdf(a)
 
         return self.cdf(b) - self.cdf(a)
@@ -153,7 +153,7 @@ class Bernoulli(ABCDiscreteDistribution):
         return self.q + self.p*np.exp(1j*t)
 
     def rmoment(self, order: Integral | ArrayLike) -> Real | ArrayLike:
-        if isinstance(order, ArrayLike): return np.full_like(order, self.p, dtype=float)
+        if isinstance(order, (list, tuple, np.ndarray)): return np.full_like(order, self.p, dtype=float)
         return self.p
 
     def cmoment(self, order: Integral | ArrayLike) -> Real | ArrayLike:

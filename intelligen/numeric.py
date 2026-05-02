@@ -37,14 +37,15 @@ def derivative(f ,a: float, order: int=1, method: str='central', h: float=0.01):
         `f'(a)`      
     """
     i = np.arange(order+1)
+    comb_arr = np.array([combination(order, int(j)) for j in i])
     if method == 'central':
-        return 1/h**order * np.sum((-1)**i * combination(order, i) * f(a + (order/2 - i)*h))
+        return 1/h**order * np.sum((-1)**i * comb_arr * f(a + (order/2 - i)*h))
 
     elif method == 'forward':
-        return  1/h**order * np.sum((-1)**(order - i) * combination(order, i) * f(a + i*h))
+        return  1/h**order * np.sum((-1)**(order - i) * comb_arr * f(a + i*h))
 
     elif method == 'backward':
-        return 1/h**order * np.sum((-1)**i * combination(order, i) * f(a - i*h))
+        return 1/h**order * np.sum((-1)**i * comb_arr * f(a - i*h))
 
     else:
         raise ValueError("Method must be 'central', 'forward' or 'backward'.")

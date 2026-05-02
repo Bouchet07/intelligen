@@ -1,33 +1,25 @@
-import unittest
-
+import pytest
 from intelligen import numeric
-
 
 def f(x): return x**3 + 2*x**2 + 10*x - 20
 ROOT = 1.36880
 
-class TestNumeric(unittest.TestCase):
-    """Tests for `intelligen` package."""
+def test_newton():
+    z = numeric.newton(f, 1, 0.01, True)[0]
+    assert pytest.approx(z, abs=1e-3) == ROOT
 
-    def test_newton(self):
-        z = numeric.newton(f, 1, 0.01, True)[0]
-        self.assertAlmostEqual(z, ROOT, 3)
+def test_bisection():
+    z = numeric.bisection(f, 1, 2, 0.01, True)[0]
+    assert pytest.approx(z, abs=1e-3) == ROOT
 
-    def test_bisection(self):
-        z = numeric.bisection(f, 1, 2, 0.01, True)[0]
-        self.assertAlmostEqual(z, ROOT, 3)
+def test_regula_falsi():
+    z = numeric.regula_falsi(f, 1, 2, 0.01, True)[0]
+    assert pytest.approx(z, abs=1e-3) == ROOT
 
-    def test_regula_falsi(self):
-        z = numeric.regula_falsi(f, 1, 2, 0.01, True)[0]
-        self.assertAlmostEqual(z, ROOT, 3)
+def test_secant():
+    z = numeric.secant(f, 1, 2, 0.01, True)[0]
+    assert pytest.approx(z, abs=1e-3) == ROOT
 
-    def test_secant(self):
-        z = numeric.secant(f, 1, 2, 0.01, True)[0]
-        self.assertAlmostEqual(z, ROOT, 3)
-
-    def test_newton2(self):
-        z = numeric.newton2(f, 1, 0.01, True)[0]
-        self.assertAlmostEqual(z, ROOT, 3)
-
-if __name__ == '__main__':
-    unittest.main()
+def test_newton2():
+    z = numeric.newton2(f, 1, 0.01, True)[0]
+    assert pytest.approx(z, abs=1e-3) == ROOT

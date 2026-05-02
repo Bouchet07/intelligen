@@ -29,17 +29,11 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.21.3
         env:
-          # Build for Python 3.10 - 3.13
-          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          # Build for Python 3.11 - 3.13
+          CIBW_BUILD: "cp311-* cp312-* cp313-*"
           
           # Skip 32-bit Windows (hard to build scipy/numpy ecosystem there)
           CIBW_SKIP: "*-win32 pp*" 
-          
-          # FIX: Use a newer Linux standard (glibc 2.28+)
-          # This ensures pip can install modern wheels for NumPy/SciPy
-          # instead of trying to compile them from source.
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
 
           # Install test dependencies
           CIBW_TEST_REQUIRES: "pytest pytest-cov ruff"

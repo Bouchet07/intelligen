@@ -1,11 +1,58 @@
 import numpy as np
-from scipy.special import comb, factorial
+#from scipy.special import comb, factorial
 
 #from constants import golden, igolden
 from ...constants import *
 
 __all__ = ['factorial', 'comb',
            'fibonacci', 'binet']
+
+def factorial(n: int) -> int:
+    """
+    Compute the factorial of a non-negative integer n.
+
+    Parameters
+    ----------
+    n : int
+        Non-negative integer to compute the factorial of.
+
+    Returns
+    -------
+    int
+        The factorial of n (n!).
+    """
+    if n < 0:
+        raise ValueError("Factorial is not defined for negative numbers.")
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+def comb(n: int, k: int, exact: bool = False) -> float:
+    """
+    Compute the binomial coefficient "n choose k".
+
+    Parameters
+    ----------
+    n : int
+        Total number of items.
+    k : int
+        Number of items to choose.
+    exact : bool, optional
+        If True, return an exact integer result. If False, return a floating-point result.
+        Default is False.
+
+    Returns
+    -------
+    float or int
+        The binomial coefficient C(n, k).
+    """
+    if k < 0 or k > n:
+        return 0
+    if exact:
+        return int(factorial(n) // (factorial(k) * factorial(n - k)))
+    else:
+        return factorial(n) / (factorial(k) * factorial(n - k))
 
 def fibonacci(n: int, list: bool = False, start_points = None) -> int:
     """

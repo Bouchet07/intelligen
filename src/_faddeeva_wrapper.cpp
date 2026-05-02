@@ -1,198 +1,119 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>             // Python C API
-#include <complex>              // For std::complex
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/arrayobject.h" // NumPy C API
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/complex.h>
+#include <complex>
+#include <vector>
+#include <execution>
 #include "Faddeeva.hh"
 
-// =============================================================================
-// Helper macro to define a Python function that dispatches to real/complex
-// C++ backends based on the input array's dtype.
-// =============================================================================
-#define FADDEEVA_DISPATCH_WRAPPER(py_name, c_name) \
-static PyObject* py_name(PyObject* self, PyObject* args) { \
-    PyObject* input_obj = NULL; \
-    double relerr = 0.0; \
-    if (!PyArg_ParseTuple(args, "O|d", &input_obj, &relerr)) { \
-        return NULL; \
-    } \
-\
-    PyArray_Descr* descr = PyArray_DescrFromObject(input_obj, NULL); \
-    if (descr == NULL) { \
-        return NULL; \
-    } \
-\
-    PyObject* result = NULL; \
-    if (PyDataType_ISCOMPLEX(descr)) { \
-        /* FIXED: Removed '0, 0,' arguments */ \
-        PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
-            input_obj, NPY_COMPLEX128, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
-        ); \
-        if (in_array == NULL) { \
-            Py_DECREF(descr); \
-            return NULL; \
-        } \
-        PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew( \
-            PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_COMPLEX128 \
-        ); \
-        if (out_array == NULL) { \
-            Py_DECREF(in_array); \
-            Py_DECREF(descr); \
-            return NULL; \
-        } \
-        std::complex<double>* in_ptr = (std::complex<double>*)PyArray_DATA(in_array); \
-        std::complex<double>* out_ptr = (std::complex<double>*)PyArray_DATA(out_array); \
-        npy_intp n = PyArray_SIZE(in_array); \
-        for (npy_intp i = 0; i < n; ++i) { \
-            out_ptr[i] = Faddeeva::c_name(in_ptr[i], relerr); \
-        } \
-        Py_DECREF(in_array); \
-        result = (PyObject*)out_array; \
-    } else { \
-        /* FIXED: Removed '0, 0,' arguments */ \
-        PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF( \
-            input_obj, NPY_DOUBLE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS \
-        ); \
-        if (in_array == NULL) { \
-            Py_DECREF(descr); \
-            return NULL; \
-        } \
-        PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew( \
-            PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_DOUBLE \
-        ); \
-        if (out_array == NULL) { \
-            Py_DECREF(in_array); \
-            Py_DECREF(descr); \
-            return NULL; \
-        } \
-        double* in_ptr = (double*)PyArray_DATA(in_array); \
-        double* out_ptr = (double*)PyArray_DATA(out_array); \
-        npy_intp n = PyArray_SIZE(in_array); \
-        for (npy_intp i = 0; i < n; ++i) { \
-            out_ptr[i] = Faddeeva::c_name(in_ptr[i]); \
-        } \
-        Py_DECREF(in_array); \
-        result = (PyObject*)out_array; \
-    } \
-\
-    Py_DECREF(descr); \
-    return result; \
-}
+// Cross-platform support for alloca
+#ifdef _WIN32
+#include <malloc.h>
+#else
+#include <alloca.h>
+#endif
 
-// =============================================================================
-// Implement the wrappers for all dispatchable functions using the macro
-// =============================================================================
-FADDEEVA_DISPATCH_WRAPPER(py_erf, erf)
-FADDEEVA_DISPATCH_WRAPPER(py_erfc, erfc)
-FADDEEVA_DISPATCH_WRAPPER(py_erfi, erfi)
-FADDEEVA_DISPATCH_WRAPPER(py_erfcx, erfcx)
-FADDEEVA_DISPATCH_WRAPPER(py_Dawson, Dawson)
+namespace nb = nanobind;
+using namespace nb::literals;
 
-
-// =============================================================================
-// Wrapper for Faddeeva::w (always complex)
-// =============================================================================
-static PyObject* py_w(PyObject* self, PyObject* args) {
-    PyObject* input_obj = NULL;
-    double relerr = 0.0;
-    if (!PyArg_ParseTuple(args, "O|d", &input_obj, &relerr)) {
-        return NULL;
-    }
+// Improved helper function: handles read-only input, drops GIL, optimizes shape allocation
+template <typename OutT, typename InT, typename Func>
+nb::ndarray<nb::numpy, OutT, nb::c_contig> apply_func(nb::ndarray<const InT, nb::c_contig> input, Func func) {
+    size_t ndim = input.ndim();
     
-    /* FIXED: Removed '0, 0,' arguments */
-    PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
-        input_obj, NPY_COMPLEX128, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
-    );
-    if (in_array == NULL) {
-        return NULL;
-    }
-
-    PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew(
-        PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_COMPLEX128
-    );
-    if (out_array == NULL) {
-        Py_DECREF(in_array);
-        return NULL;
-    }
-
-    std::complex<double>* in_ptr = (std::complex<double>*)PyArray_DATA(in_array);
-    std::complex<double>* out_ptr = (std::complex<double>*)PyArray_DATA(out_array);
-    npy_intp n = PyArray_SIZE(in_array);
-
-    for (npy_intp i = 0; i < n; ++i) {
-        out_ptr[i] = Faddeeva::w(in_ptr[i], relerr);
-    }
-
-    Py_DECREF(in_array);
-    return (PyObject*)out_array;
-}
-
-// =============================================================================
-// Wrapper for Faddeeva::w_im (real input, real output)
-// =============================================================================
-static PyObject* py_w_im(PyObject* self, PyObject* args) {
-    PyObject* input_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &input_obj)) {
-        return NULL;
-    }
+    // Use a stack-allocated buffer for shape since ndim is typically very small
+    size_t* shape = (size_t*)alloca(ndim * sizeof(size_t)); 
+    for (size_t i = 0; i < ndim; ++i) shape[i] = input.shape(i);
     
-    /* FIXED: Removed '0, 0,' arguments */
-    PyArrayObject* in_array = (PyArrayObject*)PyArray_FROM_OTF(
-        input_obj, NPY_DOUBLE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_C_CONTIGUOUS
-    );
-    if (in_array == NULL) {
-        return NULL;
-    }
-
-    PyArrayObject* out_array = (PyArrayObject*)PyArray_SimpleNew(
-        PyArray_NDIM(in_array), PyArray_DIMS(in_array), NPY_DOUBLE
-    );
-    if (out_array == NULL) {
-        Py_DECREF(in_array);
-        return NULL;
-    }
-
-    double* in_ptr = (double*)PyArray_DATA(in_array);
-    double* out_ptr = (double*)PyArray_DATA(out_array);
-    npy_intp n = PyArray_SIZE(in_array);
-
-    for (npy_intp i = 0; i < n; ++i) {
-        out_ptr[i] = Faddeeva::w_im(in_ptr[i]);
-    }
-
-    Py_DECREF(in_array);
-    return (PyObject*)out_array;
+    OutT* data = new OutT[input.size()];
+    nb::capsule owner(data, [](void *p) noexcept { delete[] (OutT *) p; });
+    nb::ndarray<nb::numpy, OutT, nb::c_contig> out_arr(data, ndim, shape, owner);
+    
+    const InT* in_ptr = input.data();
+    OutT* out_ptr = out_arr.data();
+    
+    // Release the GIL before heavy computation to allow other Python threads to run
+    nb::gil_scoped_release release; 
+    
+    std::transform(std::execution::par_unseq, in_ptr, in_ptr + input.size(), out_ptr, func);
+    
+    return out_arr;
 }
 
+NB_MODULE(_faddeeva, m) {
+    // ------------------------------------------------------------------------
+    // w
+    // ------------------------------------------------------------------------
+    m.def("w", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::w(z, relerr); });
+    }, "input"_a, "relerr"_a = 0, "Calculate the Faddeeva function, w(z).");
+    m.def("w", [](std::complex<double> z, double relerr) { return Faddeeva::w(z, relerr); }, "z"_a, "relerr"_a = 0);
 
-// =============================================================================
-// Method and Module Definitions
-// =============================================================================
+    // ------------------------------------------------------------------------
+    // w_im
+    // ------------------------------------------------------------------------
+    m.def("w_im", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::w_im(x); });
+    }, "input"_a, "Calculate Im[w(x)] for real x.");
+    m.def("w_im", [](double x) { return Faddeeva::w_im(x); }, "x"_a);
 
-static PyMethodDef FaddeevaMethods[] = {
-    {"w", py_w, METH_VARARGS, "Calculate the Faddeeva function, w(z)."},
-    {"w_im", py_w_im, METH_VARARGS, "Calculate Im[w(x)] for real x."},
-    {"erf", py_erf, METH_VARARGS, "Calculate the error function, erf(z)."},
-    {"erfc", py_erfc, METH_VARARGS, "Calculate the complementary error function, erfc(z)."},
-    {"erfi", py_erfi, METH_VARARGS, "Calculate the imaginary error function, erfi(z)."},
-    {"erfcx", py_erfcx, METH_VARARGS, "Calculate the scaled complementary error function, erfcx(z)."},
-    {"Dawson", py_Dawson, METH_VARARGS, "Calculate the Dawson function, Dawson(z)."},
-    {NULL, NULL, 0, NULL} // Sentinel
-};
+    // ------------------------------------------------------------------------
+    // erf
+    // ------------------------------------------------------------------------
+    m.def("erf", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::erf(x); });
+    }, "input"_a);
+    m.def("erf", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::erf(z, relerr); });
+    }, "input"_a, "relerr"_a = 0);
+    m.def("erf", [](double x) { return Faddeeva::erf(x); }, "x"_a);
+    m.def("erf", [](std::complex<double> z, double relerr) { return Faddeeva::erf(z, relerr); }, "z"_a, "relerr"_a = 0);
 
-static struct PyModuleDef faddeeva_module = {
-    PyModuleDef_HEAD_INIT,
-    "intelligen.special._faddeeva", // IMPORTANT: Matches the full package path
-    "A C++ extension for the complete Faddeeva function package.",
-    -1,
-    FaddeevaMethods
-};
+    // ------------------------------------------------------------------------
+    // erfc
+    // ------------------------------------------------------------------------
+    m.def("erfc", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::erfc(x); });
+    }, "input"_a);
+    m.def("erfc", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::erfc(z, relerr); });
+    }, "input"_a, "relerr"_a = 0);
+    m.def("erfc", [](double x) { return Faddeeva::erfc(x); }, "x"_a);
+    m.def("erfc", [](std::complex<double> z, double relerr) { return Faddeeva::erfc(z, relerr); }, "z"_a, "relerr"_a = 0);
 
-extern "C" PyMODINIT_FUNC PyInit__faddeeva(void) {
-    PyObject* m = PyModule_Create(&faddeeva_module);
-    if (m == NULL) {
-        return NULL;
-    }
-    import_array();
-    return m;
+    // ------------------------------------------------------------------------
+    // erfi
+    // ------------------------------------------------------------------------
+    m.def("erfi", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::erfi(x); });
+    }, "input"_a);
+    m.def("erfi", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::erfi(z, relerr); });
+    }, "input"_a, "relerr"_a = 0);
+    m.def("erfi", [](double x) { return Faddeeva::erfi(x); }, "x"_a);
+    m.def("erfi", [](std::complex<double> z, double relerr) { return Faddeeva::erfi(z, relerr); }, "z"_a, "relerr"_a = 0);
+
+    // ------------------------------------------------------------------------
+    // erfcx
+    // ------------------------------------------------------------------------
+    m.def("erfcx", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::erfcx(x); });
+    }, "input"_a);
+    m.def("erfcx", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::erfcx(z, relerr); });
+    }, "input"_a, "relerr"_a = 0);
+    m.def("erfcx", [](double x) { return Faddeeva::erfcx(x); }, "x"_a);
+    m.def("erfcx", [](std::complex<double> z, double relerr) { return Faddeeva::erfcx(z, relerr); }, "z"_a, "relerr"_a = 0);
+
+    // ------------------------------------------------------------------------
+    // Dawson
+    // ------------------------------------------------------------------------
+    m.def("Dawson", [](nb::ndarray<const double, nb::c_contig> input) {
+        return apply_func<double>(input, [&](double x) { return Faddeeva::Dawson(x); });
+    }, "input"_a);
+    m.def("Dawson", [](nb::ndarray<const std::complex<double>, nb::c_contig> input, double relerr) {
+        return apply_func<std::complex<double>>(input, [&](std::complex<double> z) { return Faddeeva::Dawson(z, relerr); });
+    }, "input"_a, "relerr"_a = 0);
+    m.def("Dawson", [](double x) { return Faddeeva::Dawson(x); }, "x"_a);
+    m.def("Dawson", [](std::complex<double> z, double relerr) { return Faddeeva::Dawson(z, relerr); }, "z"_a, "relerr"_a = 0);
 }

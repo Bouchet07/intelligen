@@ -117,6 +117,20 @@ class Binomial(ABCDiscreteDistribution):
 
     def pdf(self, a: Real, b: Real) -> Real:
         return self.cdf(b) - self.cdf(a)
+    
+    def cf(self, t: Real | ArrayLike) -> Real | ArrayLike:
+        t = np.asarray(t)
+        if t.ndim > 0:
+            return np.array([self.cf(i) for i in t])
+        else:
+            return (self.q + self.p*np.exp(1j*t))**self.n
+
+    def mgf(self, t: Real | ArrayLike) -> Real | ArrayLike:
+        t = np.asarray(t)
+        if t.ndim > 0:
+            return np.array([self.mgf(i) for i in t])
+        else:
+            return (self.q + self.p*np.exp(t))**self.n
 
     def plot_pmf(self, ax=None):
         if ax is None: ax = plt.gca()

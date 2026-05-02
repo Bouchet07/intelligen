@@ -2,7 +2,7 @@ from functools import cached_property
 
 import numpy as np
 
-from scipy.special import erf, erfinv
+from ...special import erf, erfinv
 from ..ABCDistribution import ABCContinousDistribution
 
 __all__ = ['Normal']

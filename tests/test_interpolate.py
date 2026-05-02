@@ -1,5 +1,3 @@
-import unittest
-
 import numpy as np
 
 from intelligen import interpolate
@@ -13,12 +11,7 @@ _x = np.linspace(min(X),max(X),1000)
 
 Lagran = interpolate.lagrange(X.reshape(-1),Y.reshape(-1))
 
-class TestInterpolate(unittest.TestCase):
-    """Tests for `intelligen` package."""
-
-    def test_lagrange(self):
-        Lagran(_x)
-
-
-if __name__ == '__main__':
-    unittest.main()
+def test_lagrange():
+    result = Lagran(_x)
+    assert result is not None
+    assert len(result) == len(_x)
