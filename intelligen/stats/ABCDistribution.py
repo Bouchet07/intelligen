@@ -1,10 +1,11 @@
 import abc
 from numbers import Real
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize as op
 from numpy.typing import ArrayLike
+
+from intelligen.utils import grid, plot
 
 
 class ABCDistribution(abc.ABC):
@@ -71,7 +72,7 @@ class ABCDistribution(abc.ABC):
 
 
     # @abc.abstractmethod
-    def plot_cdf(self, ax = None, limit=None, **kwargs) -> plt.axes:
+    def plot_cdf(self, ax = None, limit=None, **kwargs):
         """Plot the Cumulative distribution function of a distribution.
 
         Returns
@@ -79,12 +80,11 @@ class ABCDistribution(abc.ABC):
         plt.axes
             returns the axes of the plot
         """
-        if ax is None: ax = plt.gca()
         if limit is None: limit = [0.01, 0.99]
         a, b = self.qf(limit)
         x = np.linspace(a, b, 100)
-        ax.plot(x, self.cdf(x), **kwargs)
-        ax.grid(True)
+        plot(x, self.cdf(x), ax=ax, **kwargs)
+        grid(visible=True, ax=ax)
         return ax
 
 
@@ -113,7 +113,7 @@ class ABCDiscreteDistribution(ABCDistribution):
         pass
 
     @abc.abstractmethod
-    def plot_pmf(self) -> plt.axes:
+    def plot_pmf(self, ax=None, **kwargs):
         """Plot the probability mass function.
 
         Returns
@@ -145,7 +145,7 @@ class ABCDiscreteDistribution(ABCDistribution):
         pass
 
     # @abc.abstractmethod
-    def plot_pdf(self, ax = None, limit=0.01) -> plt.axes:
+    def plot_pdf(self, ax = None, limit=0.01):
         """Plot the Probability density function of a distribution.
 
         Returns
@@ -213,7 +213,7 @@ class ABCContinousDistribution(ABCDistribution):
         pass
 
     # @abc.abstractmethod
-    def plot_pdf(self, ax = None, limit=0.01, **kwargs) -> plt.axes:
+    def plot_pdf(self, ax = None, limit=0.01, **kwargs):
         """Plot the Probability density function of a distribution.
 
         Returns
@@ -221,12 +221,11 @@ class ABCContinousDistribution(ABCDistribution):
         plt.axes
             returns the axes of the plot
         """
-        if ax is None: ax = plt.gca()
         a = op.fsolve(lambda x:self.pdf(x)-limit, self.mean-np.sqrt(self.variance))[0]
         b = op.fsolve(lambda x:self.pdf(x)-limit, self.mean+np.sqrt(self.variance))[0]
         x = np.linspace(a,b,100)
-        ax.plot(x, self.pdf(x), **kwargs)
-        ax.grid(True)
+        ax = plot(x, self.pdf(x), ax=ax, **kwargs)
+        ax = grid(visible=True, ax=ax)
         return ax
 
 # type alias

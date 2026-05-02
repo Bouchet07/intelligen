@@ -7,7 +7,7 @@ from importlib import metadata
 # e.g., so they can access `intelligen.AI`. The `noqa`
 # comment at the top of the file tells Ruff this is intentional.
 from . import (
-    AI,
+    config,
     constants,
     integrate,
     intelligen,
@@ -19,13 +19,13 @@ from . import (
     signals,
     special,
     stats,
+    utils,
 )
 
 __version__ = metadata.version("intelligen")
 
 # Define the public API for when a user does `from intelligen import *`
 __all__ = [
-    "AI",
     "constants",
     "integrate",
     "intelligen",
@@ -37,6 +37,8 @@ __all__ = [
     "signals",
     "special",
     "stats",
+    "config",
+    "utils",
     "__version__", # It's good practice to include __version__ in __all__
 ]
 
