@@ -33,8 +33,11 @@ jobs:
           # Build only for Python 3.13 to keep testing fast initially
           CIBW_BUILD: "cp313-*"
           
-          # Skip 32-bit Windows/Linux, PyPy, MuslLinux (Alpine), and free-threaded python
-          CIBW_SKIP: "*-win32 *-i686 pp* *-musllinux* cp313t-*" 
+          # Skip 32-bit Windows, PyPy, MuslLinux (Alpine), and free-threaded python
+          CIBW_SKIP: "*-win32 pp* *-musllinux* cp313t-*" 
+          
+          # Build only 64-bit architectures (skips 32-bit Linux i686 automatically)
+          CIBW_ARCHS: "auto64" 
 
           # Use modern Linux base image (SciPy 1.17+ dropped support for manylinux2014)
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
