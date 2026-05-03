@@ -7,6 +7,7 @@ on:
     branches: ["master", "main"]
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   build_wheels:
@@ -21,26 +22,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Only needed if you want to support ARM builds (optional)
+      # Only needed if you want to support ARM builds on Linux
       - name: Set up QEMU
         if: runner.os == 'Linux'
         uses: docker/setup-qemu-action@v3
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        uses: pypa/cibuildwheel@v2.22.0
         env:
-          # Build for Python 3.11 - 3.13
-          CIBW_BUILD: "cp311-* cp312-* cp313-*"
+          # Build only for Python 3.13 to keep testing fast initially
+          CIBW_BUILD: "cp313-*"
           
-          # Skip 32-bit Windows (hard to build scipy/numpy ecosystem there)
-          CIBW_SKIP: "*-win32 pp*" 
+          # Skip 32-bit Windows/Linux, PyPy, and MuslLinux (Alpine) to avoid compilation issues
+          CIBW_SKIP: "*-win32 *-i686 pp* *-musllinux*" 
 
-          # Install test dependencies
-          CIBW_TEST_REQUIRES: "pytest pytest-cov ruff"
+          # Use your dev dependencies from pyproject.toml (includes pytest)
+          CIBW_TEST_EXTRAS: "dev"
           
-          # CRITICAL FIX: --import-mode=importlib
-          # This prevents pytest from picking up the local 'intelligen' folder 
-          # (which is uncompiled) and forces it to use the installed wheel.
+          # Test the installed wheel, not the local uncompiled code
           CIBW_TEST_COMMAND: "pytest {project}/tests --import-mode=importlib"
 
       - name: Upload built wheels
@@ -49,13 +48,17 @@ jobs:
           name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
-  # NEW: Build the Source Distribution (.tar.gz)
   make_sdist:
     name: Make Source Distribution
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       - name: Build SDist
         run: pipx run build --sdist
 
@@ -66,12 +69,12 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, make_sdist] # Wait for both wheels and sdist
+    needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'created'
+    # Run publish if a release is created or workflow is manually triggered
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && github.event.action == 'created')
     
     steps:
-      # Download artifacts from all previous jobs
       - uses: actions/download-artifact@v4
         with:
           pattern: wheels-*
