@@ -78,6 +78,9 @@ jobs:
     name: Publish to PyPI
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     # Run publish if a release is created or workflow is manually triggered
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && github.event.action == 'created')
     
@@ -95,5 +98,3 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.GHA_PYPI_API_TOKEN }}
