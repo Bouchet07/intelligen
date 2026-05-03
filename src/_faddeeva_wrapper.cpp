@@ -35,7 +35,11 @@ nb::ndarray<nb::numpy, OutT, nb::c_contig> apply_func(nb::ndarray<const InT, nb:
     // Release the GIL before heavy computation to allow other Python threads to run
     nb::gil_scoped_release release; 
     
+#if defined(__APPLE__)
+    std::transform(in_ptr, in_ptr + input.size(), out_ptr, func);
+#else
     std::transform(std::execution::par_unseq, in_ptr, in_ptr + input.size(), out_ptr, func);
+#endif
     
     return out_arr;
 }
