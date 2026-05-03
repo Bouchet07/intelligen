@@ -36,6 +36,10 @@ jobs:
           # Skip 32-bit Windows/Linux, PyPy, MuslLinux (Alpine), and free-threaded python
           CIBW_SKIP: "*-win32 *-i686 pp* *-musllinux* cp313t-*" 
 
+          # Use modern Linux base image (SciPy 1.17+ dropped support for manylinux2014)
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+
           # Use your dev dependencies from pyproject.toml (includes pytest)
           CIBW_TEST_EXTRAS: "dev"
           
