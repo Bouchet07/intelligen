@@ -28,7 +28,7 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           # Support the latest 3 versions of Python
-          CIBW_BUILD: "cp311-* cp312-* cp313-*"
+          CIBW_BUILD: "cp312-* cp313-* cp314-*"
           
           # Skip 32-bit Windows, PyPy, and MuslLinux (Alpine)
           CIBW_SKIP: "*-win32 pp* *-musllinux*" 
