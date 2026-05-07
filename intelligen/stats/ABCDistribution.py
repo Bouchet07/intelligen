@@ -83,8 +83,8 @@ class ABCDistribution(abc.ABC):
         if limit is None: limit = [0.01, 0.99]
         a, b = self.qf(limit)
         x = np.linspace(a, b, 100)
-        plot(x, self.cdf(x), ax=ax, **kwargs)
-        grid(visible=True, ax=ax)
+        ax = plot(x, self.cdf(x), ax=ax, **kwargs)
+        ax = grid(visible=True, ax=ax)
         return ax
 
 

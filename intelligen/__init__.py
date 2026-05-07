@@ -4,7 +4,7 @@
 from importlib import metadata
 
 # These imports make submodules available to the user,
-# e.g., so they can access `intelligen.AI`. The `noqa`
+# e.g., so they can access `intelligen.constants`. The `noqa`
 # comment at the top of the file tells Ruff this is intentional.
 from . import (
     constants,

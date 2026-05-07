@@ -1,9 +1,16 @@
 import abc
 
-import matplotlib.pyplot as plt
 import numpy as np
 
-from ..metrics import mean_squared_error, r2_score
+from intelligen.metrics import mean_squared_error, r2_score
+from intelligen.utils.plot_utils import (
+    plot,
+    plot_surface,
+    scatter,
+    scatter_3d,
+    set_labels,
+)
+from intelligen.utils.types import PlotReturnType
 
 
 class LinearModel:
@@ -73,18 +80,18 @@ class LinearModel:
         if y_pred is None: y_pred = self.predict()
         return r2_score(y_true, y_pred, multioutput=multioutput)
 
-    def plot(self, ax=None, p_data = 1, n_data = 100) -> plt.Axes:
+    def plot(self, ax=None, p_data = 1, n_data = 100) -> PlotReturnType:
         """Plot the linear regression data against the real data.
 
         Parameters
         ----------
-            ax (plt.Axes, optional): The axes to plot on. Defaults to None (creates a new one).
+            ax (PlotReturnType, optional): The axes to plot on. Defaults to None (creates a new one).
             p_data (float, optional): Percentage of data to use for plotting. Defaults to 1 (100%).
             n_data (int, optional): Number of data points to plot. Defaults to 100.
 
         Returns
         -------
-            plt.Axes: The axes with the plot.
+            PlotReturnType: The axes with the plot.
         """
         self.check_is_fitted()
         if self.y.ndim != 1: raise ValueError('multitarget is not supported at the moment')
@@ -103,44 +110,40 @@ class LinearModel:
             X, y = X[index], y[index]
 
         if self.n_features_in_ == 1:
-            if ax is None: ax = plt.gca()
-            ax.set_title('Simple Linear Regression')
-
-            # min_y, max_y = np.min(self.y), np.max(self.y)
-            # ax.set_ylim(min_y, max_y)
             min_x, max_x = np.min(self.X), np.max(self.X)
-            # ax.set_xlim(min_x, max_x)
             min_y_pred, max_y_pred = self.predict(np.array([[min_x],[max_x]]))
 
-            # ax.set_xmargin(10)
-            # ax.set_ymargin(10)
+            # 1. Plot the scatter data
+            ax = scatter(X, y, ax=ax)
 
-            ax.set_xlabel('X')
-            ax.set_ylabel('y')
+            # 2. Plot the regression line
+            # Note: passing tuples/lists of X and Y coordinates
+            ax = plot([min_x, max_x], [min_y_pred, max_y_pred], ax=ax)
 
-            ax.plot((min_x, max_x), (min_y_pred, max_y_pred), c='red', label='Regression')
-            ax.scatter(X, y, c='#325aa8', s=15, label='Data')
-            # ax.legend()
+            # 3. Apply the formatting
+            ax = set_labels(
+                title='Simple Linear Regression',
+                xlabel='X',
+                ylabel='y',
+                ax=ax
+            )
+            return ax
 
 
         elif self.n_features_in_ == 2:
-            if ax is None:
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
-            ax.set_title('Multiple Linear Regression')
+            min_x = np.min(self.X, axis=0)
+            max_x = np.max(self.X, axis=0)
 
-            min_x = np.min(self.X, axis = 0)
-            max_x = np.max(self.X, axis = 0)
-
-            x_axis = np.array([min_x[0],max_x[0]])
-            y_axis = np.array([min_x[1],max_x[1]])
+            x_axis = np.array([min_x[0], max_x[0]])
+            y_axis = np.array([min_x[1], max_x[1]])
 
             x1, x2 = np.meshgrid(x_axis, y_axis)
             y_p = x1 * self.coef_[0] + x2 * self.coef_[1] + self.intercept_
 
-            ax.plot_surface(x1, x2, y_p, color = 'royalblue', alpha = 0.5, label='Regression')
-            ax.scatter(X[:, 0], X[:, 1], y, c = 'lightcoral', label='Data')
-            # ax.legend()
+            # Use your backend wrappers!
+            ax = plot_surface(x1, x2, y_p, ax=ax, label='Regression')
+            ax = scatter_3d(X[:, 0], X[:, 1], y, ax=ax, label='Data')
+            ax = set_labels(title='Multiple Linear Regression', ax=ax)
         else:
             raise ValueError(f'plot doesn\'t support {self.n_features_in_} number of features')
         return ax
