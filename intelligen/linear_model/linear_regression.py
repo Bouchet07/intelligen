@@ -1,11 +1,12 @@
 import numpy as np
-#from scipy.optimize import nnls
-def nnls(A, b):
-    return 0
 
 from .ABCLinearModel import LinearModel
 
 # Bibliography https://github.com/arseniyturin/SGD-From-Scratch/blob/master/Gradient%20Descent.ipynb
+
+#from scipy.optimize import nnls
+def nnls(A, b):
+    return 0
 
 class LinearRegression(LinearModel):
     """

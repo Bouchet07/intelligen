@@ -1,6 +1,9 @@
 import importlib.util
 
+
 class Config:
+    """Configuration class for intelligen. This class holds global settings that can be accessed and modified by users of the library."""
+
     def __init__(self):
         self._supported_plot_backends: list[str] = ["matplotlib", "plotly", "bokeh"]
         self._supported_progress_bars: list[str] = ["tqdm", "alive_progress"]
@@ -71,6 +74,7 @@ class Config:
         self._progress_bar = value
 
     def __repr__(self) -> str:
+        """Return a custom string representation for the Config class."""
         display_attrs = {
             k.lstrip('_'): v
             for k, v in self.__dict__.items()
