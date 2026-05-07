@@ -1,4 +1,4 @@
-from .config import config
+from intelligen.config import config
 
 __all__ = ["plot", "grid"]
 
